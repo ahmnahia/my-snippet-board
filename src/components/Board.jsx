@@ -5,10 +5,10 @@ import useBoardHook from "@/hooks/useBoardHook";
 
 export default function Board() {
   const {
-    state: { scale, snippets },
+    state: { scale, snippets, mousePosition },
   } = useBoardHook();
-  console.log("SIPPETS ARRAY: ", snippets);
-  
+  console.log("SIPPETS ARRAY: ", mousePosition);
+
   return (
     <div
       className={`z-0 bg-pink-100 absolute board-bg hover:cursor-grab`}

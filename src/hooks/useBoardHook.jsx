@@ -5,6 +5,7 @@ import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
 const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
   ADD_A_NEW_SNIPPET: "ADD_A_NEW_SNIPPET",
+  CHANGE_MOUSE_POSITION_VALUE: "CHANGE_MOUSE_POSITION_VALUE",
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -19,7 +20,10 @@ const reducer = (state, action) => {
       return { ...state, scale: value };
 
     case ACTIONS.ADD_A_NEW_SNIPPET:
-      return { ...state, snippets: [...snippets, action.payload] };
+      return { ...state, snippets: [...state.snippets, action.payload] };
+
+    case ACTIONS.CHANGE_MOUSE_POSITION_VALUE:
+      return { ...state, mousePosition: action.payload };
     default:
       return state;
   }
@@ -29,14 +33,9 @@ const reducer = (state, action) => {
 
 export default function useBoardHook() {
   const [state, dispatch] = useReducer(reducer, {
-    snippets: [
-      {
-        id: "div-1",
-        title: "test #1",
-        content: "Test test content coeeedededed",
-      },
-    ],
+    snippets: [],
     scale: 1,
+    mousePosition: { x: undefined, y: undefined },
   });
 
   useEffect(() => {
@@ -47,7 +46,7 @@ export default function useBoardHook() {
   }, []);
 
   useEffect(() => {
-    if (state.snippets) {
+    if (state.snippets && state.snippets.length > 0) {
       dragElement(
         document.getElementById(state.snippets[state.snippets.length - 1].id)
       );
@@ -68,10 +67,21 @@ export default function useBoardHook() {
         payload: { scrollDirection },
       });
     };
-    window.addEventListener("wheel", handleScroll, { passive: false });
+    const handleMouseMove = (event) => {
+      dispatch({
+        type: ACTIONS.CHANGE_MOUSE_POSITION_VALUE,
+        payload: {
+          x: event.clientX,
+          y: event.clientY,
+        },
+      });
+    };
 
+    window.addEventListener("wheel", handleScroll, { passive: false });
+    window.addEventListener("mousemove", handleMouseMove);
     return () => {
       window.removeEventListener("wheel", handleScroll);
+      window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 

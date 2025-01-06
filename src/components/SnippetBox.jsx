@@ -4,7 +4,7 @@ import { RiDragMove2Fill } from "react-icons/ri";
 export default function Snippet({ id, title, content }) {
   return (
     <div
-      className={`border flex flex-col  cursor-default border-zinc-400 z-10 bg-white rounded-lg shadow-xl  w-[400px] h-[200px] min-h-[200px] min-w-[200px] resize overflow-hidden`}
+      className={`border flex flex-col  cursor-default border-zinc-400 z-10 bg-white rounded-lg shadow-xl  w-[400px] h-[200px] min-h-[200px] min-w-[200px] resize overflow-hidden hover:z-50 hover:outline-2 hover:outline hover:outline-blue-200`}
       style={{
         position: "absolute",
         top: "50%",
