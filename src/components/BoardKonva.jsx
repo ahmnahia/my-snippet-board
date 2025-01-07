@@ -17,7 +17,6 @@ export default function Board() {
     innerHeight: 110,
   });
   const [stars, setStars] = useState([]);
-  console.log(windowSize);
 
   useEffect(() => {
     setWindowSize({

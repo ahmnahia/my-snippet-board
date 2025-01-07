@@ -94,17 +94,16 @@ export default function useBoardHook() {
         (event.ctrlKey && event.key == "V") ||
         (event.ctrlKey && event.key == "v")
       ) {
-        console.log("CTRL + V detected!");
         navigator.clipboard
           .readText()
           .then((text) => {
-            console.log("Pasted content: ", text);
             dispatch({
               type: ACTIONS.ADD_A_NEW_SNIPPET,
               payload: {
                 id: "div-" + state.snippets.length,
                 title: "Code #" + state.snippets.length,
                 content: text,
+                language: "javascript"
               },
             });
           })

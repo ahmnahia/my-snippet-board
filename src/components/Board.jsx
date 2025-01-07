@@ -1,5 +1,5 @@
 "use client";
-import { boardSize } from "@/constants/sizes";
+import { boardSize } from "@/constants";
 import SnippetBox from "./SnippetBox";
 import useBoardHook from "@/hooks/useBoardHook";
 
@@ -7,7 +7,6 @@ export default function Board() {
   const {
     state: { scale, snippets, mousePosition },
   } = useBoardHook();
-  console.log("SIPPETS ARRAY: ", mousePosition);
 
   return (
     <div
@@ -28,6 +27,7 @@ export default function Board() {
           id={eachSnippet.id}
           title={eachSnippet.title}
           content={eachSnippet.content}
+          language={eachSnippet.language}
         />
       ))}
     </div>
