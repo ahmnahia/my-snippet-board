@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
-
 @layer utilities {
   .board-bg {
     background-color: #f9f9f9;
@@ -16,6 +13,10 @@
     overflow: auto;
     min-width: 200px;
     min-height: 200px;
+  }
+
+  .snippet.dragging {
+    user-select: none;
   }
 }
 

@@ -6,6 +6,7 @@ const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
   ADD_A_NEW_SNIPPET: "ADD_A_NEW_SNIPPET",
   CHANGE_MOUSE_POSITION_VALUE: "CHANGE_MOUSE_POSITION_VALUE",
+  CHANGE_SNIPPET_PRISM_LANGUAGE: "CHANGE_SNIPPET_PRISM_LANGUAGE",
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -24,12 +25,19 @@ const reducer = (state, action) => {
 
     case ACTIONS.CHANGE_MOUSE_POSITION_VALUE:
       return { ...state, mousePosition: action.payload };
+    case ACTIONS.CHANGE_SNIPPET_PRISM_LANGUAGE:
+      const newSnippets = state.snippets.map((eachSnip) => {
+        if (eachSnip.id == action.payload.snippetId)
+          return { ...eachSnip, language: action.payload.prismKey };
+        return eachSnip;
+      });
+      return { ...state, snippets: newSnippets };
     default:
       return state;
   }
 };
 
-// a snippet will consist of {title: string, content: code or whatever kind of text}
+// a snippet will consist of {title: string, content: code or whatever kind of text, language: prism key}
 
 export default function useBoardHook() {
   const [state, dispatch] = useReducer(reducer, {
@@ -67,21 +75,23 @@ export default function useBoardHook() {
         payload: { scrollDirection },
       });
     };
-    const handleMouseMove = (event) => {
-      dispatch({
-        type: ACTIONS.CHANGE_MOUSE_POSITION_VALUE,
-        payload: {
-          x: event.clientX,
-          y: event.clientY,
-        },
-      });
-    };
+
+    // commenting out mouse state update because it is causing a lot of re renders. Need to find another way #TODO 
+    // const handleMouseMove = (event) => {
+    //   dispatch({
+    //     type: ACTIONS.CHANGE_MOUSE_POSITION_VALUE,
+    //     payload: {
+    //       x: event.clientX,
+    //       y: event.clientY,
+    //     },
+    //   });
+    // };
 
     window.addEventListener("wheel", handleScroll, { passive: false });
-    window.addEventListener("mousemove", handleMouseMove);
+    // window.addEventListener("mousemove", handleMouseMove);
     return () => {
       window.removeEventListener("wheel", handleScroll);
-      window.removeEventListener("mousemove", handleMouseMove);
+      // window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 
@@ -103,7 +113,7 @@ export default function useBoardHook() {
                 id: "div-" + state.snippets.length,
                 title: "Code #" + state.snippets.length,
                 content: text,
-                language: "javascript"
+                language: "javascript",
               },
             });
           })
@@ -120,5 +130,12 @@ export default function useBoardHook() {
     };
   }, [state.snippets]);
 
-  return { state, dispatch };
+  const changeSnippetLanguage = (snippetId, prismKey) => {
+    dispatch({
+      type: ACTIONS.CHANGE_SNIPPET_PRISM_LANGUAGE,
+      payload: { snippetId, prismKey },
+    });
+  };
+
+  return { state, dispatch, changeSnippetLanguage };
 }

@@ -1,6 +1,6 @@
 export const boardSize = 15000;
 
-const prismLanguages = {
+export const prismLanguages = {
   javascript: { name: "JavaScript" },
   css: { name: "CSS" },
   html: { name: "HTML" },

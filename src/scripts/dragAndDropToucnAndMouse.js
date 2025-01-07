@@ -1,10 +1,13 @@
 export function dragElement(elmnt) {
-  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  let currentX = 0, currentY = 0;
+  let pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
+  let currentX = 0,
+    currentY = 0;
 
   const header = document.getElementById(elmnt.id + "header");
   const dragTarget = header || elmnt;
-  console.log("called?!!");
 
   dragTarget.onmousedown = dragMouseDown;
   dragTarget.ontouchstart = dragTouchStart;
@@ -15,10 +18,15 @@ export function dragElement(elmnt) {
     }
 
     e = e || window.event;
-    // e.preventDefault(); 
+    // e.preventDefault();
 
     pos3 = e.clientX;
     pos4 = e.clientY;
+
+    // Adding the "dragging" class to all snippets to prevent unintended code highlighting when dragging a snippet
+    document.querySelectorAll(".snippet").forEach((snippet) => {
+      snippet.classList.add("dragging");
+    });
 
     document.onmouseup = closeDragElement;
     document.onmousemove = elementDrag;
@@ -30,9 +38,8 @@ export function dragElement(elmnt) {
     }
 
     e = e || window.event;
-    // e.preventDefault(); 
+    // e.preventDefault();
 
-    
     pos3 = e.touches[0].clientX;
     pos4 = e.touches[0].clientY;
 
@@ -42,7 +49,7 @@ export function dragElement(elmnt) {
 
   function elementDrag(e) {
     e = e || window.event;
-    // e.preventDefault(); 
+    // e.preventDefault();
 
     // For mouse events
     if (e.clientX && e.clientY) {
@@ -62,11 +69,15 @@ export function dragElement(elmnt) {
     currentX -= pos1;
     currentY -= pos2;
 
-    
     elmnt.style.transform = `translate(${currentX}px, ${currentY}px)`;
   }
 
   function closeDragElement() {
+    // Removing the "dragging" class from all snippets
+    document.querySelectorAll(".snippet").forEach((snippet) => {
+      snippet.classList.remove("dragging");
+    });
+
     document.onmouseup = null;
     document.onmousemove = null;
     document.ontouchend = null;
@@ -87,7 +98,6 @@ export function dragElement(elmnt) {
 //   const header = document.getElementById(elmnt.id + "header");
 //   const dragTarget = header || elmnt;
 //   console.log("called?!!");
-  
 
 //   dragTarget.onmousedown = dragMouseDown;
 //   dragTarget.ontouchstart = dragTouchStart
@@ -115,7 +125,7 @@ export function dragElement(elmnt) {
 //       // Prevent dragging if the target is a child element
 //       return;
 //     }
-    
+
 //     e = e || window.event;
 //     // e.preventDefault();
 
@@ -124,7 +134,7 @@ export function dragElement(elmnt) {
 //     pos4 = e.clientY;
 
 //     // Attach event listeners for mouse movement and release
-    
+
 //     document.ontouchend = closeDragElement;
 //     document.ontouchmove = elementDrag;
 //   }
@@ -153,7 +163,6 @@ export function dragElement(elmnt) {
 //     document.onmousemove = null;
 //     document.ontouchend = null;
 //     document.ontouchmove = null;
-
 
 //   }
 // }

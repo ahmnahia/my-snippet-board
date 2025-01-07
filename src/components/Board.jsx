@@ -6,6 +6,7 @@ import useBoardHook from "@/hooks/useBoardHook";
 export default function Board() {
   const {
     state: { scale, snippets, mousePosition },
+    changeSnippetLanguage,
   } = useBoardHook();
 
   return (
@@ -28,6 +29,7 @@ export default function Board() {
           title={eachSnippet.title}
           content={eachSnippet.content}
           language={eachSnippet.language}
+          changeSnippetLanguage={changeSnippetLanguage}
         />
       ))}
     </div>

@@ -11,17 +11,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { prismLanguagesSorted } from "@/constants";
+import { prismLanguagesSorted, prismLanguages } from "@/constants";
 const firstEle = prismLanguagesSorted[0];
-export default function Snippet({ id, title, content, language }) {
+export default function Snippet({
+  id,
+  title,
+  content,
+  language,
+  changeSnippetLanguage,
+}) {
   useEffect(() => {
     Prism.highlightAll();
-  }, []);
-  console.log(prismLanguagesSorted);
+  }, [language]);
 
   return (
     <div
-      className={`border flex flex-col  cursor-default border-zinc-400 z-10 bg-white rounded-lg shadow-xl  w-[400px] h-[200px] min-h-[200px] min-w-[200px] resize overflow-hidden hover:z-50 hover:outline-2 hover:outline hover:outline-blue-200`}
+      className={`border flex flex-col  cursor-default border-zinc-400 z-10 bg-white rounded-lg shadow-xl  w-[400px] h-[200px] min-h-[200px] min-w-[200px] resize overflow-hidden hover:z-50 hover:outline-2 hover:outline hover:outline-blue-200 snippet`}
       style={{
         position: "absolute",
         top: "50%",
@@ -41,15 +46,20 @@ export default function Snippet({ id, title, content, language }) {
         <div className="flex gap-3">
           <div className="">
             <DropdownMenu className="">
-              <DropdownMenuTrigger>{firstEle.name}</DropdownMenuTrigger>
+              <DropdownMenuTrigger>{prismLanguages[language].name}</DropdownMenuTrigger>
 
               <DropdownMenuContent className="h-[300px] overflow-auto">
                 {prismLanguagesSorted.map((eachLng, idx) => {
                   return (
-                      <DropdownMenuItem key={eachLng.prismKey}>
-                        {eachLng.name}
-                      </DropdownMenuItem>
-                      // <DropdownMenuSeparator key={eachLng.prismKey + idx} />
+                    <DropdownMenuItem
+                      key={eachLng.prismKey}
+                      onClick={() => {
+                        changeSnippetLanguage(id, eachLng.prismKey);
+                      }}
+                    >
+                      {eachLng.name}
+                    </DropdownMenuItem>
+                    // <DropdownMenuSeparator key={eachLng.prismKey + idx} />
                   );
                 })}
                 {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -61,7 +71,7 @@ export default function Snippet({ id, title, content, language }) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <div className="cursor-move text-2xl " id={id + "header"}>
+          <div className="cursor-move text-2xl " id={id + "header"} >
             <RiDragMove2Fill />
           </div>
         </div>
@@ -69,7 +79,9 @@ export default function Snippet({ id, title, content, language }) {
       <div className="px-4 content overflow-auto">
         <span className="hover:cursor-text">
           <pre>
-            <code className={`language-${language}`}>{content}</code>
+            <code className={`language-${language}`}>
+              {content}
+            </code>
           </pre>
         </span>
       </div>
