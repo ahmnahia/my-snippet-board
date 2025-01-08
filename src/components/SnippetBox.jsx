@@ -1,57 +1,26 @@
 "use client";
 import { useEffect } from "react";
-import Prism from "prismjs";
 import { RiDragMove2Fill } from "react-icons/ri";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { prismLanguagesSorted, prismLanguages } from "@/constants";
-// import "prismjs/components/prism-clike";
-// Object.keys(prismLanguages).forEach((eachPrimKey) => {
+import Prism from "prismjs";
+import { prismLanguagesSorted, prismLanguages } from "@/constants/prismImports";
 
-//   import("prismjs/components/prism-" + eachPrimKey)
-//     .then(() => {
-//       console.log("loaded success");
-//     })
-//     .catch((e) => {
-//       console.log(e);
-//     });
-// });
-// import "prismjs/components/prism-cpp";
-// import "prismjs/components/prism-java";
-// import "prismjs/themes/prism-tomorrow.css";
 
 export default function Snippet({
   id,
   title,
   content,
   language,
+  position,
   changeSnippetLanguage,
 }) {
-  // useEffect(() => {
-  //   Prism.highlightAll();
-  //   // const element = document.getElementById(`code-${id}`);
-  //   // if (element) {
-  //   //   Prism.highlightElement(element);
-  //   // }
-  // }, [language]);
   useEffect(() => {
-    const loadLanguages = async () => {
-      const promises = Object.keys(prismLanguages).map((eachPrimKey) =>
-        import("prismjs/components/prism-" + eachPrimKey).catch((e) => {
-          console.error(`Failed to load language: ${eachPrimKey}`, e);
-        })
-      );
-      await Promise.all(promises);
-      Prism.highlightAll();
-    };
-  
-    loadLanguages();
+    Prism.highlightAll();
   }, [language]);
 
   return (
@@ -59,8 +28,10 @@ export default function Snippet({
       className={`border flex flex-col  cursor-default border-zinc-400 z-10 bg-white rounded-lg shadow-xl  w-[400px] h-[200px] min-h-[200px] min-w-[200px] resize overflow-hidden hover:z-50 hover:outline-2 hover:outline hover:outline-blue-200 snippet`}
       style={{
         position: "absolute",
-        top: "50%",
-        left: "50%",
+        // top: "50%",
+        // left: "50%",
+        top: position.top,
+        left: position.left,
       }}
       id={id}
       onClick={(e) => {
@@ -91,15 +62,9 @@ export default function Snippet({
                     >
                       {eachLng.name}
                     </DropdownMenuItem>
-                    // <DropdownMenuSeparator key={eachLng.prismKey + idx} />
                   );
                 })}
-                {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
-                <DropdownMenuItem>Team</DropdownMenuItem>
-                <DropdownMenuItem>Subscription</DropdownMenuItem> */}
+
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

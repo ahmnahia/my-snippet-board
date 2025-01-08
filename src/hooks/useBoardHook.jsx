@@ -1,5 +1,5 @@
 "use client";
-import React, { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useRef } from "react";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
 
 const ACTIONS = {
@@ -24,7 +24,8 @@ const reducer = (state, action) => {
       return { ...state, snippets: [...state.snippets, action.payload] };
 
     case ACTIONS.CHANGE_MOUSE_POSITION_VALUE:
-      return { ...state, mousePosition: action.payload };
+      state.mousePosition.current = action.payload;
+      return { ...state, mousePosition: state.mousePosition };
     case ACTIONS.CHANGE_SNIPPET_PRISM_LANGUAGE:
       const newSnippets = state.snippets.map((eachSnip) => {
         if (eachSnip.id == action.payload.snippetId)
@@ -37,27 +38,30 @@ const reducer = (state, action) => {
   }
 };
 
-// a snippet will consist of {title: string, content: code or whatever kind of text, language: prism key}
+// a snippet will consist of {title: string, content: code or whatever kind of text, language: prism key, position}
 
 export default function useBoardHook() {
+  const mousePosition = useRef({ x: undefined, y: undefined });
+
   const [state, dispatch] = useReducer(reducer, {
     snippets: [],
     scale: 1,
-    mousePosition: { x: undefined, y: undefined },
   });
 
   useEffect(() => {
-    // to handle dragging the board & the snippets
+    // to handle dragging the board
     document.querySelector("body").style.overflow = "hidden";
-    // dragElement(document.getElementById("div-1"));
     dragElement(document.getElementById("board"));
   }, []);
 
   useEffect(() => {
     if (state.snippets && state.snippets.length > 0) {
+      // add event listener to the snippet for dragging
       dragElement(
         document.getElementById(state.snippets[state.snippets.length - 1].id)
       );
+
+      // save the snippet in local storage for persistence
     }
   }, [state.snippets]);
 
@@ -76,22 +80,18 @@ export default function useBoardHook() {
       });
     };
 
-    // commenting out mouse state update because it is causing a lot of re renders. Need to find another way #TODO 
-    // const handleMouseMove = (event) => {
-    //   dispatch({
-    //     type: ACTIONS.CHANGE_MOUSE_POSITION_VALUE,
-    //     payload: {
-    //       x: event.clientX,
-    //       y: event.clientY,
-    //     },
-    //   });
-    // };
+    const handleMouseMove = (event) => {
+      mousePosition.current = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+    };
 
     window.addEventListener("wheel", handleScroll, { passive: false });
-    // window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
     return () => {
       window.removeEventListener("wheel", handleScroll);
-      // window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 
@@ -104,6 +104,9 @@ export default function useBoardHook() {
         (event.ctrlKey && event.key == "V") ||
         (event.ctrlKey && event.key == "v")
       ) {
+        const boardDiv = document.querySelector("#board");
+        const boardDims = boardDiv.getBoundingClientRect();
+
         navigator.clipboard
           .readText()
           .then((text) => {
@@ -114,6 +117,14 @@ export default function useBoardHook() {
                 title: "Code #" + state.snippets.length,
                 content: text,
                 language: "javascript",
+                position: {
+                  top:
+                    (boardDims.top * -1 + mousePosition.current.y) /
+                    state.scale,
+                  left:
+                    (boardDims.left * -1 + mousePosition.current.x - 400) /
+                    state.scale,
+                },
               },
             });
           })
@@ -128,7 +139,7 @@ export default function useBoardHook() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [state.snippets]);
+  }, [state.snippets, state.scale]);
 
   const changeSnippetLanguage = (snippetId, prismKey) => {
     dispatch({
@@ -137,5 +148,5 @@ export default function useBoardHook() {
     });
   };
 
-  return { state, dispatch, changeSnippetLanguage };
+  return { state, dispatch, changeSnippetLanguage, mousePosition };
 }
