@@ -7,6 +7,7 @@ const ACTIONS = {
   ADD_A_NEW_SNIPPET: "ADD_A_NEW_SNIPPET",
   CHANGE_MOUSE_POSITION_VALUE: "CHANGE_MOUSE_POSITION_VALUE",
   CHANGE_SNIPPET_PRISM_LANGUAGE: "CHANGE_SNIPPET_PRISM_LANGUAGE",
+  DELETE_SNIPPET: "DELETE_SNIPPET",
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -33,6 +34,14 @@ const reducer = (state, action) => {
         return eachSnip;
       });
       return { ...state, snippets: newSnippets };
+
+    case ACTIONS.DELETE_SNIPPET:
+      return {
+        ...state,
+        snippets: state.snippets.filter(
+          (eachSnippet) => eachSnippet.id != action.payload
+        ),
+      };
     default:
       return state;
   }
@@ -96,6 +105,7 @@ export default function useBoardHook() {
   }, []);
 
   useEffect(() => {
+    // Handle creating a new snippet (ctrl + v)
     if (!state.snippets) {
       return;
     }
@@ -107,14 +117,18 @@ export default function useBoardHook() {
         const boardDiv = document.querySelector("#board");
         const boardDims = boardDiv.getBoundingClientRect();
 
+        const lastSnippet = state.snippets[state.snippets.length - 1];
+        const nextIdNumber = lastSnippet
+          ? Number(lastSnippet.id.split("-")[1]) + 1
+          : 1;
         navigator.clipboard
           .readText()
           .then((text) => {
             dispatch({
               type: ACTIONS.ADD_A_NEW_SNIPPET,
               payload: {
-                id: "div-" + state.snippets.length,
-                title: "Code #" + state.snippets.length,
+                id: "snippet-" + nextIdNumber,
+                title: "Snippet #" + nextIdNumber,
                 content: text,
                 language: "javascript",
                 position: {
@@ -148,5 +162,15 @@ export default function useBoardHook() {
     });
   };
 
-  return { state, dispatch, changeSnippetLanguage, mousePosition };
+  const deleteSnippet = (snippetId) => {
+    dispatch({ type: ACTIONS.DELETE_SNIPPET, payload: snippetId });
+  };
+
+  return {
+    state,
+    dispatch,
+    changeSnippetLanguage,
+    mousePosition,
+    deleteSnippet,
+  };
 }

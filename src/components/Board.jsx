@@ -7,6 +7,7 @@ export default function Board() {
   const {
     state: { scale, snippets },
     changeSnippetLanguage,
+    deleteSnippet,
   } = useBoardHook();
 
   return (
@@ -31,6 +32,7 @@ export default function Board() {
           language={eachSnippet.language}
           position={eachSnippet.position}
           changeSnippetLanguage={changeSnippetLanguage}
+          deleteSnippet={deleteSnippet}
         />
       ))}
     </div>

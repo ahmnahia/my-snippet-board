@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { RiDragMove2Fill } from "react-icons/ri";
 import {
   DropdownMenu,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Prism from "prismjs";
 import { prismLanguagesSorted, prismLanguages } from "@/constants/prismImports";
-
+import { snippetBoxHoverBorderColorLight } from "@/constants";
 
 export default function Snippet({
   id,
@@ -18,14 +18,38 @@ export default function Snippet({
   language,
   position,
   changeSnippetLanguage,
+  deleteSnippet,
 }) {
   useEffect(() => {
     Prism.highlightAll();
   }, [language]);
 
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleKeyDown = (event) => {
+    if (isHovered && event.key === "Delete") {
+      console.log("Delete key pressed while hovering!" + id);
+      deleteSnippet(id);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isHovered]);
+
   return (
     <div
-      className={`border flex flex-col  cursor-default border-zinc-400 z-10 bg-white rounded-lg shadow-xl  w-[400px] h-[200px] min-h-[200px] min-w-[200px] resize overflow-hidden hover:z-50 hover:outline-2 hover:outline hover:outline-blue-200 snippet`}
+      className={`border flex flex-col  cursor-default border-zinc-400 z-10 bg-white rounded-lg shadow-xl  w-[400px] h-[200px] min-h-[200px] min-w-[200px] resize overflow-hidden hover:z-50 hover:outline-2 hover:outline hover:${snippetBoxHoverBorderColorLight} snippet`}
+      onMouseOver={() => {
+        setIsHovered(true);
+      }}
+      onMouseOut={() => {
+        setIsHovered(false);
+      }}
       style={{
         position: "absolute",
         // top: "50%",
@@ -64,7 +88,6 @@ export default function Snippet({
                     </DropdownMenuItem>
                   );
                 })}
-
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
