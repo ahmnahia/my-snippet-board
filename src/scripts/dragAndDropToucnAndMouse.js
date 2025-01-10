@@ -66,8 +66,9 @@ export function dragElement(elmnt) {
       pos4 = e.touches[0].clientY;
     }
 
-    currentX -= pos1;
-    currentY -= pos2;
+    const scale = Number(document.querySelector("#board").style.scale);
+    currentX -= pos1 / scale;
+    currentY -= pos2 / scale;
 
     elmnt.style.transform = `translate(${currentX}px, ${currentY}px)`;
   }

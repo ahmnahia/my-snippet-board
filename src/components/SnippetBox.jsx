@@ -16,7 +16,7 @@ export default function Snippet({
   title,
   content,
   language,
-  position,
+  dimensions,
   changeSnippetLanguage,
   deleteSnippet,
 }) {
@@ -28,7 +28,6 @@ export default function Snippet({
 
   const handleKeyDown = (event) => {
     if (isHovered && event.key === "Delete") {
-      console.log("Delete key pressed while hovering!" + id);
       deleteSnippet(id);
     }
   };
@@ -43,7 +42,7 @@ export default function Snippet({
 
   return (
     <div
-      className={`border flex flex-col  cursor-default border-zinc-400 z-10 bg-white rounded-lg shadow-xl  w-[400px] h-[200px] min-h-[200px] min-w-[200px] resize overflow-hidden hover:z-50 hover:outline-2 hover:outline hover:${snippetBoxHoverBorderColorLight} snippet`}
+      className={`border-2 flex flex-col  cursor-default border-zinc-400 dark:border-zinc-800 z-10 bg-white dark:bg-zinc-800 rounded-lg shadow-xl resize-drag overflow-hidden hover:z-50 hover:outline-2 hover:outline hover:outline-blue-200 dark:outline-zinc-500  snippet`}
       onMouseOver={() => {
         setIsHovered(true);
       }}
@@ -54,15 +53,17 @@ export default function Snippet({
         position: "absolute",
         // top: "50%",
         // left: "50%",
-        top: position.top,
-        left: position.left,
+        top: dimensions.top,
+        left: dimensions.left,
+        width: dimensions.width,
+        height: dimensions.height
       }}
       id={id}
       onClick={(e) => {
         e.stopPropagation();
       }}
     >
-      <div className="w-full flex justify-between p-1 bg-zinc-50 border-b-2 border-b-zinc-200">
+      <div className="w-full flex justify-between bg-zinc-100 dark:bg-zinc-900 border-b-2 border-b-zinc-200 dark:border-b-zinc-700 px-5 py-2">
         <div>
           <h5 className="">
             <b>{title}</b>
@@ -96,7 +97,7 @@ export default function Snippet({
           </div>
         </div>
       </div>
-      <div className="px-4 content flex overflow-auto">
+      <div className="content flex overflow-auto">
         <span className="hover:cursor-text flex-1">
           <pre>
             <code className={`language-${language}`}>{content}</code>

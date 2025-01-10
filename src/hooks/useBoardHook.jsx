@@ -1,6 +1,7 @@
 "use client";
 import { useReducer, useEffect, useRef } from "react";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
+import { resizeDiv } from "@/scripts/resizing";
 
 const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
@@ -8,7 +9,9 @@ const ACTIONS = {
   CHANGE_MOUSE_POSITION_VALUE: "CHANGE_MOUSE_POSITION_VALUE",
   CHANGE_SNIPPET_PRISM_LANGUAGE: "CHANGE_SNIPPET_PRISM_LANGUAGE",
   DELETE_SNIPPET: "DELETE_SNIPPET",
+  UPDATE_WIDTH_AND_HEIGHT: "UPDATE_WIDTH_AND_HEIGHT",
 };
+
 const reducer = (state, action) => {
   switch (action.type) {
     case ACTIONS.CHANGE_SCALE_VALUE:
@@ -34,7 +37,6 @@ const reducer = (state, action) => {
         return eachSnip;
       });
       return { ...state, snippets: newSnippets };
-
     case ACTIONS.DELETE_SNIPPET:
       return {
         ...state,
@@ -42,12 +44,30 @@ const reducer = (state, action) => {
           (eachSnippet) => eachSnippet.id != action.payload
         ),
       };
+
+    case ACTIONS.UPDATE_WIDTH_AND_HEIGHT:
+      return {
+        ...state,
+        snippets: state.snippets.map((eachSnippet) => {
+          if (eachSnippet.id == action.payload.snippetId) {
+            return {
+              ...eachSnippet,
+              dimensions: {
+                ...eachSnippet.dimensions,
+                width: action.payload.width,
+                height: action.payload.height,
+              },
+            };
+          }
+          return eachSnippet;
+        }),
+      };
     default:
       return state;
   }
 };
 
-// a snippet will consist of {title: string, content: code or whatever kind of text, language: prism key, position}
+// a snippet will consist of {title: string, content: code or whatever kind of text, language: prism key, dimensions}
 
 export default function useBoardHook() {
   const mousePosition = useRef({ x: undefined, y: undefined });
@@ -68,6 +88,10 @@ export default function useBoardHook() {
       // add event listener to the snippet for dragging
       dragElement(
         document.getElementById(state.snippets[state.snippets.length - 1].id)
+      );
+      resizeDiv(
+        state.snippets[state.snippets.length - 1].id,
+        updateWidthAndHeight
       );
 
       // save the snippet in local storage for persistence
@@ -131,13 +155,15 @@ export default function useBoardHook() {
                 title: "Snippet #" + nextIdNumber,
                 content: text,
                 language: "javascript",
-                position: {
+                dimensions: {
                   top:
                     (boardDims.top * -1 + mousePosition.current.y) /
                     state.scale,
                   left:
                     (boardDims.left * -1 + mousePosition.current.x - 400) /
                     state.scale,
+                  width: 400,
+                  height: 200,
                 },
               },
             });
@@ -164,6 +190,13 @@ export default function useBoardHook() {
 
   const deleteSnippet = (snippetId) => {
     dispatch({ type: ACTIONS.DELETE_SNIPPET, payload: snippetId });
+  };
+
+  const updateWidthAndHeight = (snippetId, width, height) => {
+    dispatch({
+      type: ACTIONS.UPDATE_WIDTH_AND_HEIGHT,
+      payload: { snippetId, width, height },
+    });
   };
 
   return {
