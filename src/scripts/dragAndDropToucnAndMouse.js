@@ -1,4 +1,4 @@
-export function dragElement(elmnt) {
+export function dragElement(elmnt, updateSnippetTransform) {
   let pos1 = 0,
     pos2 = 0,
     pos3 = 0,
@@ -78,6 +78,10 @@ export function dragElement(elmnt) {
     document.querySelectorAll(".snippet").forEach((snippet) => {
       snippet.classList.remove("dragging");
     });
+
+    console.log("ID: ", elmnt.id, elmnt.style.transform);
+    
+    updateSnippetTransform(elmnt.id, elmnt.style.transform);
 
     document.onmouseup = null;
     document.onmousemove = null;

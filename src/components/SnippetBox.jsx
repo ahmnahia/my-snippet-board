@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Prism from "prismjs";
 import { prismLanguagesSorted, prismLanguages } from "@/constants/prismImports";
+import { resizeDiv } from "@/scripts/resizing";
+import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
 import { snippetBoxHoverBorderColorLight } from "@/constants";
 
 export default function Snippet({
@@ -19,12 +21,20 @@ export default function Snippet({
   dimensions,
   changeSnippetLanguage,
   deleteSnippet,
+  updateSnippetTransform,
+  updateWidthAndHeight,
 }) {
   useEffect(() => {
     Prism.highlightAll();
   }, [language]);
 
   const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    //listeners to resize and drag the snippet
+    resizeDiv(id, updateWidthAndHeight);
+    dragElement(document.getElementById(id), updateSnippetTransform);
+  }, []);
 
   const handleKeyDown = (event) => {
     if (isHovered && event.key === "Delete") {
@@ -56,7 +66,8 @@ export default function Snippet({
         top: dimensions.top,
         left: dimensions.left,
         width: dimensions.width,
-        height: dimensions.height
+        height: dimensions.height,
+        transform: dimensions.transform,
       }}
       id={id}
       onClick={(e) => {

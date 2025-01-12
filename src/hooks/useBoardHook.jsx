@@ -10,6 +10,9 @@ const ACTIONS = {
   CHANGE_SNIPPET_PRISM_LANGUAGE: "CHANGE_SNIPPET_PRISM_LANGUAGE",
   DELETE_SNIPPET: "DELETE_SNIPPET",
   UPDATE_WIDTH_AND_HEIGHT: "UPDATE_WIDTH_AND_HEIGHT",
+  LOAD_DATA_FROM_LS: "LOAD_DATA_FROM_LS",
+  UPDATE_SNIPPET_TRANSFORM: "UPDATE_SNIPPET_TRANSFORM",
+  UPDATE_BOARD_TRANSFORM: "UPDATE_BOARD_TRANSFORM",
 };
 
 const reducer = (state, action) => {
@@ -62,6 +65,30 @@ const reducer = (state, action) => {
           return eachSnippet;
         }),
       };
+    case ACTIONS.LOAD_DATA_FROM_LS:
+      return { ...state, snippets: action.payload.storedSnippets };
+
+    case ACTIONS.UPDATE_SNIPPET_TRANSFORM:
+      return {
+        ...state,
+        snippets: state.snippets.map((eachSnippet) => {
+          if (eachSnippet.id == action.payload.snippetId) {
+            return {
+              ...eachSnippet,
+              dimensions: {
+                ...eachSnippet.dimensions,
+                transform: action.payload.transformString,
+              },
+            };
+          }
+          return eachSnippet;
+        }),
+      };
+    case ACTIONS.UPDATE_BOARD_TRANSFORM:
+      return {
+        ...state,
+        boardDimensions: { ...state.boardDimensions, transform: action.payload },
+      };
     default:
       return state;
   }
@@ -73,28 +100,48 @@ export default function useBoardHook() {
   const mousePosition = useRef({ x: undefined, y: undefined });
 
   const [state, dispatch] = useReducer(reducer, {
-    snippets: [],
+    snippets: undefined,
     scale: 1,
+    boardDimensions: { transform: "translate(0,0)" },
   });
 
   useEffect(() => {
-    // to handle dragging the board
-    document.querySelector("body").style.overflow = "hidden";
-    dragElement(document.getElementById("board"));
+    let storedSnippets;
+    storedSnippets = JSON.parse(localStorage.getItem("snippets"));
+    // const boardDimensions = localStorage.getItem("boardDimensions");
+    if (!storedSnippets) {
+      storedSnippets = [];
+    }
+    dispatch({ type: ACTIONS.LOAD_DATA_FROM_LS, payload: { storedSnippets } });
   }, []);
 
   useEffect(() => {
-    if (state.snippets && state.snippets.length > 0) {
-      // add event listener to the snippet for dragging
-      dragElement(
-        document.getElementById(state.snippets[state.snippets.length - 1].id)
-      );
-      resizeDiv(
-        state.snippets[state.snippets.length - 1].id,
-        updateWidthAndHeight
-      );
+    // to handle dragging the board
+    if (!state.snippets) {
+      // this if statement is needed because board won't show unless there are snippets
+      return;
+    }
+    document.querySelector("body").style.overflow = "hidden";
+    dragElement(document.getElementById("board"), updateSnippetTransform);
+  }, [state.snippets]);
 
+  //   useEffect(() => {
+  //     if (state.snippets && state.snippets.length > 0) {
+  //       // add event listener to the snippet for dragging - won't add new event listerns (will keep overriding)
+  //       dragElement(
+  //         document.getElementById(state.snippets[state.snippets.length - 1].id)
+  //       );
+  //       resizeDiv(
+  //         state.snippets[state.snippets.length - 1].id,
+  //         updateWidthAndHeight
+  //       );
+  //     }
+  //   }, [state.snippets]);
+
+  useEffect(() => {
+    if (state.snippets) {
       // save the snippet in local storage for persistence
+      localStorage.setItem("snippets", JSON.stringify(state.snippets));
     }
   }, [state.snippets]);
 
@@ -199,11 +246,27 @@ export default function useBoardHook() {
     });
   };
 
+  const updateSnippetTransform = (snippetId, transformString) => {
+    if (snippetId == "board") {
+      dispatch({
+        type: ACTIONS.UPDATE_BOARD_TRANSFORM,
+        payload: transformString,
+      });
+    } else {
+      dispatch({
+        type: ACTIONS.UPDATE_SNIPPET_TRANSFORM,
+        payload: { snippetId, transformString },
+      });
+    }
+  };
+
   return {
     state,
     dispatch,
     changeSnippetLanguage,
     mousePosition,
     deleteSnippet,
+    updateSnippetTransform,
+    updateWidthAndHeight,
   };
 }

@@ -19,13 +19,17 @@ export const resizeDiv = (id, updateSnippetWidthAndHeight) => {
         // update the element's style
         target.style.width = newWidth + "px";
         target.style.height = newHeight + "px";
-
-        updateSnippetWidthAndHeight(id, newWidth, newHeight);
       },
-      end() {
+      end(event) {
         document.querySelectorAll(".snippet").forEach((snippet) => {
           snippet.classList.remove("resizing");
         });
+
+        // update state with snippet's new width&height
+        const scale = Number(document.querySelector("#board").style.scale);
+        const newWidth = event.rect.width / scale;
+        const newHeight = event.rect.height / scale;
+        updateSnippetWidthAndHeight(id, newWidth, newHeight);
       },
     },
     modifiers: [
