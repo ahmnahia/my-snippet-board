@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { RiDragMove2Fill } from "react-icons/ri";
+import { RiDragMove2Fill, RiFileCopyFill } from "react-icons/ri";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +24,7 @@ export default function Snippet({
   updateSnippetTransform,
   updateWidthAndHeight,
 }) {
-  useEffect(() => { 
+  useEffect(() => {
     Prism.highlightAll();
   }, [language]);
 
@@ -106,6 +106,18 @@ export default function Snippet({
                 })}
               </DropdownMenuContent>
             </DropdownMenu>
+          </div>
+          <div className="text-2xl cursor-pointer">
+            <RiFileCopyFill
+              onClick={() => {
+                navigator.clipboard
+                  .writeText(content)
+                  .then(() => {})
+                  .catch((e) => {
+                    console.log("Error copying the snippet");
+                  });
+              }}
+            />
           </div>
           <div className="cursor-move text-2xl " id={id + "header"}>
             <RiDragMove2Fill />
