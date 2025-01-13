@@ -2,6 +2,8 @@
 import { useReducer, useEffect, useRef } from "react";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
 import { resizeDiv } from "@/scripts/resizing";
+import { boardSize } from "@/constants";
+import { getTranslateXY } from "@/scripts";
 
 const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
@@ -66,7 +68,31 @@ const reducer = (state, action) => {
         }),
       };
     case ACTIONS.LOAD_DATA_FROM_LS:
-      return { ...state, snippets: action.payload.storedSnippets };
+      // adding transform to left and top and resseting transform to fix issues when dragging the board or a snippet
+      return {
+        ...state,
+        snippets: action.payload.storedSnippets.map((eachSnippet) => {
+          const transX = getTranslateXY(eachSnippet.dimensions.transform)[0];
+          const transY = getTranslateXY(eachSnippet.dimensions.transform)[1];
+          eachSnippet.dimensions = {
+            ...eachSnippet.dimensions,
+            top: eachSnippet.dimensions.top + transY,
+            left: eachSnippet.dimensions.left + transX,
+            transform: "translate(0px, 0px)",
+          };
+          return eachSnippet;
+        }),
+        boardDimensions: {
+          ...action.payload.boardDimensions,
+          left:
+            action.payload.boardDimensions.left +
+            getTranslateXY(action.payload.boardDimensions.transform)[0],
+          top:
+            action.payload.boardDimensions.top +
+            getTranslateXY(action.payload.boardDimensions.transform)[1],
+          transform: "translate(0px, 0px)",
+        },
+      };
 
     case ACTIONS.UPDATE_SNIPPET_TRANSFORM:
       return {
@@ -87,7 +113,10 @@ const reducer = (state, action) => {
     case ACTIONS.UPDATE_BOARD_TRANSFORM:
       return {
         ...state,
-        boardDimensions: { ...state.boardDimensions, transform: action.payload },
+        boardDimensions: {
+          ...state.boardDimensions,
+          transform: action.payload,
+        },
       };
     default:
       return state;
@@ -98,45 +127,52 @@ const reducer = (state, action) => {
 
 export default function useBoardHook() {
   const mousePosition = useRef({ x: undefined, y: undefined });
+  const isBoardDragListenerSet = useRef(false);
 
   const [state, dispatch] = useReducer(reducer, {
     snippets: undefined,
     scale: 1,
-    boardDimensions: { transform: "translate(0,0)" },
   });
 
   useEffect(() => {
-    let storedSnippets;
+    // Handles getting saved data and loading them into the state
+
+    let storedSnippets, boardDimensions;
     storedSnippets = JSON.parse(localStorage.getItem("snippets"));
-    // const boardDimensions = localStorage.getItem("boardDimensions");
+    boardDimensions = JSON.parse(localStorage.getItem("boardDimensions"));
+
+    // if no stored values, then set some default values
     if (!storedSnippets) {
       storedSnippets = [];
     }
-    dispatch({ type: ACTIONS.LOAD_DATA_FROM_LS, payload: { storedSnippets } });
+    if (!boardDimensions) {
+      boardDimensions = {
+        transform: "translate(0px, 0px)",
+        width: boardSize,
+        height: boardSize,
+        top: -boardSize / 2,
+        left: -boardSize / 2,
+      };
+    }
+    dispatch({
+      type: ACTIONS.LOAD_DATA_FROM_LS,
+      payload: { storedSnippets, boardDimensions },
+    });
   }, []);
 
   useEffect(() => {
     // to handle dragging the board
+    if (isBoardDragListenerSet.current) {
+      return;
+    }
     if (!state.snippets) {
       // this if statement is needed because board won't show unless there are snippets
       return;
     }
     document.querySelector("body").style.overflow = "hidden";
     dragElement(document.getElementById("board"), updateSnippetTransform);
+    isBoardDragListenerSet.current = true;
   }, [state.snippets]);
-
-  //   useEffect(() => {
-  //     if (state.snippets && state.snippets.length > 0) {
-  //       // add event listener to the snippet for dragging - won't add new event listerns (will keep overriding)
-  //       dragElement(
-  //         document.getElementById(state.snippets[state.snippets.length - 1].id)
-  //       );
-  //       resizeDiv(
-  //         state.snippets[state.snippets.length - 1].id,
-  //         updateWidthAndHeight
-  //       );
-  //     }
-  //   }, [state.snippets]);
 
   useEffect(() => {
     if (state.snippets) {
@@ -144,6 +180,16 @@ export default function useBoardHook() {
       localStorage.setItem("snippets", JSON.stringify(state.snippets));
     }
   }, [state.snippets]);
+
+  useEffect(() => {
+    if (!state.boardDimensions) {
+      return;
+    }
+    localStorage.setItem(
+      "boardDimensions",
+      JSON.stringify(state.boardDimensions)
+    );
+  }, [state.boardDimensions]);
 
   useEffect(() => {
     // to handle zooming in & out
@@ -211,6 +257,7 @@ export default function useBoardHook() {
                     state.scale,
                   width: 400,
                   height: 200,
+                  transform: "translate(0px, 0px)",
                 },
               },
             });

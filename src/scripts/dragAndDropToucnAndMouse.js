@@ -79,8 +79,6 @@ export function dragElement(elmnt, updateSnippetTransform) {
       snippet.classList.remove("dragging");
     });
 
-    console.log("ID: ", elmnt.id, elmnt.style.transform);
-    
     updateSnippetTransform(elmnt.id, elmnt.style.transform);
 
     document.onmouseup = null;

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { RiDragMove2Fill } from "react-icons/ri";
 import {
   DropdownMenu,
@@ -24,16 +24,22 @@ export default function Snippet({
   updateSnippetTransform,
   updateWidthAndHeight,
 }) {
-  useEffect(() => {
+  useEffect(() => { 
     Prism.highlightAll();
   }, [language]);
 
   const [isHovered, setIsHovered] = useState(false);
+  const isListenerSet = useRef(false);
 
   useEffect(() => {
     //listeners to resize and drag the snippet
+    if (isListenerSet.current) {
+      return;
+    }
+
     resizeDiv(id, updateWidthAndHeight);
     dragElement(document.getElementById(id), updateSnippetTransform);
+    isListenerSet.current = true;
   }, []);
 
   const handleKeyDown = (event) => {
@@ -61,8 +67,6 @@ export default function Snippet({
       }}
       style={{
         position: "absolute",
-        // top: "50%",
-        // left: "50%",
         top: dimensions.top,
         left: dimensions.left,
         width: dimensions.width,

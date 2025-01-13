@@ -13,21 +13,20 @@ export default function Board() {
     updateWidthAndHeight,
   } = useBoardHook();
 
-  if (!snippets) {
+  if (!snippets || !boardDimensions) {
     return <h1> Loading ...</h1>;
   }
-  console.log("after if statement before board component", boardDimensions);
 
   return (
     <>
       <BoardNavBar />
       <div
-        className={`z-0  absolute board-bg hover:cursor-grab dark:board-bg-dark`}
+        className={`z-0 absolute board-bg hover:cursor-grab dark:board-bg-dark`}
         style={{
-          left: -boardSize / 2,
-          top: -boardSize / 2,
+          left: boardDimensions.left,
+          top: boardDimensions.top,
           width: boardSize,
-          height: boardSize,
+          height: boardSize,  
           scale: scale,
           transform: boardDimensions.transform,
         }}
