@@ -147,9 +147,7 @@ export default function useBoardHook() {
     storedSnippets = JSON.parse(localStorage.getItem("snippets"));
     boardDimensions = JSON.parse(localStorage.getItem("boardDimensions"));
     folderAndFilesKeys = JSON.parse(localStorage.getItem("folderAndFilesKeys"));
-    currentFileDestination = JSON.parse(
-      localStorage.getItem("currentFileDestination")
-    );
+    currentFileDestination = localStorage.getItem("currentFileDestination");
 
     // if no stored values, then set some default values
     if (!storedSnippets) {
@@ -182,8 +180,16 @@ export default function useBoardHook() {
   }, []);
 
   useEffect(() => {
+    // update ls whenever new folder/file created or curren opened file changed
     if (state.folderAndFilesKeys && state.currentFileDestination) {
-        
+      localStorage.setItem(
+        "folderAndFilesKeys",
+        JSON.stringify(state.folderAndFilesKeys)
+      );
+      localStorage.setItem(
+        "currentFileDestination",
+        state.currentFileDestination
+      );
     }
   }, [state.folderAndFilesKeys, state.currentFileDestination]);
 

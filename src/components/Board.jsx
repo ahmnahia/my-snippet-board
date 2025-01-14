@@ -6,27 +6,36 @@ import BoardNavBar from "./BoardNavBar";
 
 export default function Board() {
   const {
-    state: { scale, snippets, boardDimensions },
+    state: {
+      scale,
+      snippets,
+      boardDimensions,
+      currentFileDestination,
+      folderAndFilesKeys,
+    },
     changeSnippetLanguage,
     deleteSnippet,
     updateSnippetTransform,
     updateWidthAndHeight,
   } = useBoardHook();
 
-  if (!snippets || !boardDimensions) {
+  if (!snippets || !boardDimensions || !currentFileDestination) {
     return <h1> Loading ...</h1>;
   }
 
   return (
     <>
-      <BoardNavBar />
+      <BoardNavBar
+        currentFileDestination={currentFileDestination}
+        folderAndFilesKeys={folderAndFilesKeys}
+      />
       <div
         className={`z-0 absolute board-bg hover:cursor-grab dark:board-bg-dark`}
         style={{
           left: boardDimensions.left,
           top: boardDimensions.top,
           width: boardSize,
-          height: boardSize,  
+          height: boardSize,
           scale: scale,
           transform: boardDimensions.transform,
         }}

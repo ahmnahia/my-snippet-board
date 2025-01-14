@@ -11,7 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { FaCode } from "react-icons/fa";
 
-export default function FolderStructurePopup() {
+export default function FolderStructurePopup({
+  currentFileDestination,
+  folderAndFilesKeys,
+}) {
   return (
     <div
       onClick={(e) => {
@@ -20,8 +23,8 @@ export default function FolderStructurePopup() {
     >
       <Dialog>
         <DialogTrigger asChild className="w-full">
-          <Button variant="outline" className="w-full">
-            Add a New Folder || File
+          <Button variant="outline" className="w-full capitalize">
+            {currentFileDestination}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] border ">
@@ -33,11 +36,25 @@ export default function FolderStructurePopup() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4 border dark:border-zinc-100 rounded-lg p-2">
-              asdasdasd
+              {folderAndFilesKeys.map((eachItem, idx) => {
+                if (typeof eachItem == "object") {
+                } else if (typeof eachItem == "string") {
+                  return (
+                    <Button
+                      variant="outline"
+                      className="px-12"
+                      key={eachItem + idx}
+                    >
+                      <FaCode />
+                      {eachItem}
+                    </Button>
+                  );
+                }
+              })}
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit">New Folder</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

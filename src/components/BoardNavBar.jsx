@@ -18,10 +18,13 @@ import {
   MenubarSubContent,
 } from "@/components/ui/menubar";
 
-export default function BoardNavBar() {
+export default function BoardNavBar({
+  currentFileDestination,
+  folderAndFilesKeys,
+}) {
   return (
     <div className="z-50 w-full flex justify-center fixed top-10">
-      <div className="w-[1000px]  h-[50px] bg-transparent border border-zinc-400 rounded-xl flex justify-between items-center px-2">
+      <div className="w-[1000px] h-[50px] bg-transparent border border-zinc-400 rounded-xl flex justify-between items-center px-2">
         <div>
           <div className="my-1 flex items-center border-[1px] border-zinc-200 px-2 rounded-lg max-w-[300px] bg-zinc-50/60 dark:bg-zinc-800/60 ">
             <label htmlFor="search-input">
@@ -45,36 +48,10 @@ export default function BoardNavBar() {
         </div>
         <div className="flex gap-3 items-center">
           <div>
-            <Menubar>
-              <MenubarMenu>
-                <MenubarTrigger>Default</MenubarTrigger>
-                <MenubarContent>
-                  <MenubarItem>
-                    <FolderStructurePopup />
-                  </MenubarItem>
-                  <MenubarItem>
-                    New Tab <MenubarShortcut>⌘T</MenubarShortcut>
-                  </MenubarItem>
-                  <MenubarItem>New Window</MenubarItem>
-                  <MenubarSeparator />
-                  <MenubarSub>
-                    <MenubarSubTrigger>Share</MenubarSubTrigger>
-                    <MenubarSubContent>
-                      <MenubarItem>Email link</MenubarItem>
-                      <MenubarSub>
-                        <MenubarSubTrigger>Messages</MenubarSubTrigger>
-                        <MenubarSubContent>
-                          <MenubarItem>Email link</MenubarItem>
-                        </MenubarSubContent>
-                      </MenubarSub>
-                      <MenubarItem>Notes</MenubarItem>
-                    </MenubarSubContent>
-                  </MenubarSub>
-                  <MenubarSeparator />
-                  <MenubarItem>Print</MenubarItem>
-                </MenubarContent>
-              </MenubarMenu>
-            </Menubar>
+            <FolderStructurePopup
+              currentFileDestination={currentFileDestination}
+              folderAndFilesKeys={folderAndFilesKeys}
+            />
           </div>
           <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 p-2">
             {/* <MdOutlineDarkMode className="text-4xl" /> */}
