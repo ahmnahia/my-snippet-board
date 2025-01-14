@@ -92,6 +92,8 @@ const reducer = (state, action) => {
             getTranslateXY(action.payload.boardDimensions.transform)[1],
           transform: "translate(0px, 0px)",
         },
+        folderAndFilesKeys: action.payload.folderAndFilesKeys,
+        currentFileDestination: action.payload.currentFileDestination,
       };
 
     case ACTIONS.UPDATE_SNIPPET_TRANSFORM:
@@ -132,14 +134,22 @@ export default function useBoardHook() {
   const [state, dispatch] = useReducer(reducer, {
     snippets: undefined,
     scale: 1,
+    folderAndFilesKeys: undefined,
+    currentFileDestination: undefined,
   });
 
   useEffect(() => {
     // Handles getting saved data and loading them into the state
-
-    let storedSnippets, boardDimensions;
+    let storedSnippets,
+      boardDimensions,
+      currentFileDestination,
+      folderAndFilesKeys;
     storedSnippets = JSON.parse(localStorage.getItem("snippets"));
     boardDimensions = JSON.parse(localStorage.getItem("boardDimensions"));
+    folderAndFilesKeys = JSON.parse(localStorage.getItem("folderAndFilesKeys"));
+    currentFileDestination = JSON.parse(
+      localStorage.getItem("currentFileDestination")
+    );
 
     // if no stored values, then set some default values
     if (!storedSnippets) {
@@ -154,11 +164,28 @@ export default function useBoardHook() {
         left: -boardSize / 2,
       };
     }
+    if (!folderAndFilesKeys) {
+      folderAndFilesKeys = ["default"];
+    }
+    if (!currentFileDestination) {
+      currentFileDestination = "default";
+    }
     dispatch({
       type: ACTIONS.LOAD_DATA_FROM_LS,
-      payload: { storedSnippets, boardDimensions },
+      payload: {
+        storedSnippets,
+        boardDimensions,
+        folderAndFilesKeys,
+        currentFileDestination,
+      },
     });
   }, []);
+
+  useEffect(() => {
+    if (state.folderAndFilesKeys && state.currentFileDestination) {
+        
+    }
+  }, [state.folderAndFilesKeys, state.currentFileDestination]);
 
   useEffect(() => {
     // to handle dragging the board

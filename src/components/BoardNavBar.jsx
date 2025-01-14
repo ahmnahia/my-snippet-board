@@ -2,9 +2,21 @@
 import { MdOutlineDarkMode } from "react-icons/md";
 import { MdOutlineUndo } from "react-icons/md";
 import { MdOutlineRedo } from "react-icons/md";
-import { Input } from "@/components/ui/input";
 import { IoSearch } from "react-icons/io5";
 import ThemeToggle from "./ThemeToggle";
+import FolderStructurePopup from "./FolderStructurePopup";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger,
+  MenubarSub,
+  MenubarSubTrigger,
+  MenubarSubContent,
+} from "@/components/ui/menubar";
 
 export default function BoardNavBar() {
   return (
@@ -31,9 +43,42 @@ export default function BoardNavBar() {
             <MdOutlineRedo className="text-4xl" />
           </div>
         </div>
-        <div>
+        <div className="flex gap-3 items-center">
+          <div>
+            <Menubar>
+              <MenubarMenu>
+                <MenubarTrigger>Default</MenubarTrigger>
+                <MenubarContent>
+                  <MenubarItem>
+                    <FolderStructurePopup />
+                  </MenubarItem>
+                  <MenubarItem>
+                    New Tab <MenubarShortcut>⌘T</MenubarShortcut>
+                  </MenubarItem>
+                  <MenubarItem>New Window</MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarSub>
+                    <MenubarSubTrigger>Share</MenubarSubTrigger>
+                    <MenubarSubContent>
+                      <MenubarItem>Email link</MenubarItem>
+                      <MenubarSub>
+                        <MenubarSubTrigger>Messages</MenubarSubTrigger>
+                        <MenubarSubContent>
+                          <MenubarItem>Email link</MenubarItem>
+                        </MenubarSubContent>
+                      </MenubarSub>
+                      <MenubarItem>Notes</MenubarItem>
+                    </MenubarSubContent>
+                  </MenubarSub>
+                  <MenubarSeparator />
+                  <MenubarItem>Print</MenubarItem>
+                </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
+          </div>
           <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 p-2">
             {/* <MdOutlineDarkMode className="text-4xl" /> */}
+
             <ThemeToggle />
           </div>
         </div>
