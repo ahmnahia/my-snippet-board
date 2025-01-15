@@ -15,6 +15,7 @@ const ACTIONS = {
   LOAD_DATA_FROM_LS: "LOAD_DATA_FROM_LS",
   UPDATE_SNIPPET_TRANSFORM: "UPDATE_SNIPPET_TRANSFORM",
   UPDATE_BOARD_TRANSFORM: "UPDATE_BOARD_TRANSFORM",
+  ADD_A_NEW_FOLDER: "ADD_A_NEW_FOLDER",
 };
 
 const reducer = (state, action) => {
@@ -120,6 +121,12 @@ const reducer = (state, action) => {
           transform: action.payload,
         },
       };
+    case ACTIONS.ADD_A_NEW_FOLDER:
+      const newFoldersAndFilesKeys = [
+        ...state.folderAndFilesKeys,
+        { folderName: action.payload.folderName },
+      ];
+      return { ...state, folderAndFilesKeys: newFoldersAndFilesKeys };
     default:
       return state;
   }
@@ -162,12 +169,14 @@ export default function useBoardHook() {
         left: -boardSize / 2,
       };
     }
-    if (!folderAndFilesKeys) {
-      folderAndFilesKeys = ["default"];
+    if (!folderAndFilesKeys && !currentFileDestination) {
+      const defaultFile = { name: "default", id: Date.now(), isFile: true };
+      folderAndFilesKeys = [defaultFile];
+      currentFileDestination = defaultFile.id;
     }
-    if (!currentFileDestination) {
-      currentFileDestination = "default";
-    }
+    // if (!currentFileDestination) {
+    //   currentFileDestination = "default";
+    // }
     dispatch({
       type: ACTIONS.LOAD_DATA_FROM_LS,
       payload: {
@@ -340,6 +349,10 @@ export default function useBoardHook() {
     }
   };
 
+  const addANewFolderOrFile = (folderName) => {
+    dispatch({ type: ACTIONS.ADD_A_NEW_FOLDER, payload: { folderName } });
+  };
+
   return {
     state,
     dispatch,
@@ -348,5 +361,6 @@ export default function useBoardHook() {
     deleteSnippet,
     updateSnippetTransform,
     updateWidthAndHeight,
+    actions: { addANewFolderOrFile },
   };
 }

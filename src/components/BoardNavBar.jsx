@@ -21,6 +21,7 @@ import {
 export default function BoardNavBar({
   currentFileDestination,
   folderAndFilesKeys,
+  actions,
 }) {
   return (
     <div className="z-50 w-full flex justify-center fixed top-10">
@@ -51,6 +52,7 @@ export default function BoardNavBar({
             <FolderStructurePopup
               currentFileDestination={currentFileDestination}
               folderAndFilesKeys={folderAndFilesKeys}
+              actions={actions}
             />
           </div>
           <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 p-2">

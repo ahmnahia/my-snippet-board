@@ -1,4 +1,5 @@
 "use client";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,12 +10,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { FaCode } from "react-icons/fa";
+import { FaCode, FaFolder } from "react-icons/fa";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 export default function FolderStructurePopup({
   currentFileDestination,
   folderAndFilesKeys,
+  actions: { addANewFolderOrFile },
 }) {
+  const [currentSelectedFileOrFolder, setCurrentSelectedFileOrFolder] =
+    useState(undefined);
+
+  const ContextMenuWrapper = ({ children }) => {
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger>{children}</ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem>Edit</ContextMenuItem>
+          <ContextMenuItem>Delete</ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    );
+  };
   return (
     <div
       onClick={(e) => {
@@ -35,26 +57,45 @@ export default function FolderStructurePopup({
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4 border dark:border-zinc-100 rounded-lg p-2">
+            <div className=" gap-4 border dark:border-zinc-100 rounded-lg p-2 flex flex-col">
               {folderAndFilesKeys.map((eachItem, idx) => {
                 if (typeof eachItem == "object") {
+                  return (
+                    <ContextMenuWrapper key={eachItem + idx}>
+                      <Button variant="outline" className="px-2 w-fit">
+                        <FaFolder />
+                        {eachItem.folderName}
+                      </Button>
+                    </ContextMenuWrapper>
+                  );
                 } else if (typeof eachItem == "string") {
                   return (
-                    <Button
-                      variant="outline"
-                      className="px-12"
-                      key={eachItem + idx}
-                    >
-                      <FaCode />
-                      {eachItem}
-                    </Button>
+                    <ContextMenuWrapper key={eachItem + idx}>
+                      <Button
+                        variant="outline"
+                        className="px-2 w-fit"
+                        onClick={() => {
+                          setCurrentSelectedFileOrFolder(eachItem);
+                        }}
+                      >
+                        <FaCode />
+                        {eachItem}
+                      </Button>
+                    </ContextMenuWrapper>
                   );
                 }
               })}
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">New Folder</Button>
+            <Button
+              type="submit"
+              onClick={() => {
+                addANewFolderOrFile("New Folder");
+              }}
+            >
+              New Folder
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

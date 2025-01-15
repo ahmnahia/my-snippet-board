@@ -17,6 +17,7 @@ export default function Board() {
     deleteSnippet,
     updateSnippetTransform,
     updateWidthAndHeight,
+    actions
   } = useBoardHook();
 
   if (!snippets || !boardDimensions || !currentFileDestination) {
@@ -28,6 +29,7 @@ export default function Board() {
       <BoardNavBar
         currentFileDestination={currentFileDestination}
         folderAndFilesKeys={folderAndFilesKeys}
+        actions={actions}
       />
       <div
         className={`z-0 absolute board-bg hover:cursor-grab dark:board-bg-dark`}
