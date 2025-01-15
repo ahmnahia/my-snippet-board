@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,21 +18,52 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 
+const traverseNestedArray = (arr, level, flattenedArray) => {
+  arr.forEach((eachItem) => {
+    flattenedArray.push({ ...eachItem, level });
+    if (eachItem.subFoldersAndFiles) {
+      traverseNestedArray(eachItem.subFoldersAndFiles, level + 1, flattenedArray);
+    }
+  });
+};
+  
 export default function FolderStructurePopup({
   currentFileDestination,
   folderAndFilesKeys,
-  actions: { addANewFolderOrFile },
+  actions: { addANewFolderOrFile, deleteAFolderOrFile },
 }) {
   const [currentSelectedFileOrFolder, setCurrentSelectedFileOrFolder] =
     useState(undefined);
+  const [flattenedArray, setFlattenedArray] = useState([]);
+  console.log("folderAndFilesKeys: ", folderAndFilesKeys);
 
-  const ContextMenuWrapper = ({ children }) => {
+  useEffect(() => {
+    let temp = [];
+    traverseNestedArray(folderAndFilesKeys, 0, temp);
+    setFlattenedArray(temp);
+  }, [folderAndFilesKeys]);
+
+  const ContextMenuWrapper = ({
+    children,
+    handleClick,
+    handleDelete,
+    buttonStyles,
+  }) => {
     return (
       <ContextMenu>
-        <ContextMenuTrigger>{children}</ContextMenuTrigger>
+        <ContextMenuTrigger>
+          <Button
+            style={buttonStyles}
+            variant="outline"
+            className="px-2 w-fit text-xs"
+            onClick={handleClick}
+          >
+            {children}
+          </Button>
+        </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem>Edit</ContextMenuItem>
-          <ContextMenuItem>Delete</ContextMenuItem>
+          <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
     );
@@ -46,10 +77,15 @@ export default function FolderStructurePopup({
       <Dialog>
         <DialogTrigger asChild className="w-full">
           <Button variant="outline" className="w-full capitalize">
-            {currentFileDestination}
+            {currentFileDestination.name}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px] border ">
+        <DialogContent
+          className="sm:max-w-[425px] border "
+          onClick={() => {
+            setCurrentSelectedFileOrFolder(undefined);
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Folder Structure</DialogTitle>
             <DialogDescription className="">
@@ -57,41 +93,49 @@ export default function FolderStructurePopup({
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className=" gap-4 border dark:border-zinc-100 rounded-lg p-2 flex flex-col">
-              {folderAndFilesKeys.map((eachItem, idx) => {
-                if (typeof eachItem == "object") {
-                  return (
-                    <ContextMenuWrapper key={eachItem + idx}>
-                      <Button variant="outline" className="px-2 w-fit">
-                        <FaFolder />
-                        {eachItem.folderName}
-                      </Button>
-                    </ContextMenuWrapper>
-                  );
-                } else if (typeof eachItem == "string") {
-                  return (
-                    <ContextMenuWrapper key={eachItem + idx}>
-                      <Button
-                        variant="outline"
-                        className="px-2 w-fit"
-                        onClick={() => {
-                          setCurrentSelectedFileOrFolder(eachItem);
-                        }}
-                      >
-                        <FaCode />
-                        {eachItem}
-                      </Button>
-                    </ContextMenuWrapper>
-                  );
-                }
+            <div className="gap-4 border border-zinc-400 dark:border-zinc-100 rounded-lg p-2 flex flex-col h-[300px] overflow-auto">
+              {flattenedArray.map((eachItem, idx) => {
+                return (
+                  <ContextMenuWrapper
+                    key={idx}
+                    handleClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentSelectedFileOrFolder(eachItem);
+                    }}
+                    handleDelete={() => {
+                      deleteAFolderOrFile(eachItem.id);
+                    }}
+                    buttonStyles={{
+                      backgroundColor:
+                        eachItem.id == currentSelectedFileOrFolder?.id
+                          ? "#a1a1aa"
+                          : null,
+                      marginLeft: 28 * eachItem.level,
+                    }}
+                  >
+                    {eachItem.isFile ? <FaCode /> : <FaFolder />}
+                    {eachItem.name}
+                  </ContextMenuWrapper>
+                );
               })}
             </div>
           </div>
           <DialogFooter>
             <Button
-              type="submit"
-              onClick={() => {
-                addANewFolderOrFile("New Folder");
+              disabled={!currentSelectedFileOrFolder?.isFile}
+              variant="outline"
+              onClick={(e) => {}}
+            >
+              Open File
+            </Button>
+            <Button
+              disabled={currentSelectedFileOrFolder?.isFile}
+              onClick={(e) => {
+                addANewFolderOrFile(
+                  "New Folder",
+                  false,
+                  currentSelectedFileOrFolder?.id
+                );
               }}
             >
               New Folder

@@ -3,7 +3,7 @@ import { useReducer, useEffect, useRef } from "react";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
 import { resizeDiv } from "@/scripts/resizing";
 import { boardSize } from "@/constants";
-import { getTranslateXY } from "@/scripts";
+import { getTranslateXY, addNestedFolder } from "@/scripts";
 
 const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
@@ -15,7 +15,8 @@ const ACTIONS = {
   LOAD_DATA_FROM_LS: "LOAD_DATA_FROM_LS",
   UPDATE_SNIPPET_TRANSFORM: "UPDATE_SNIPPET_TRANSFORM",
   UPDATE_BOARD_TRANSFORM: "UPDATE_BOARD_TRANSFORM",
-  ADD_A_NEW_FOLDER: "ADD_A_NEW_FOLDER",
+  ADD_A_NEW_FOLDER_OR_FILE: "ADD_A_NEW_FOLDER_OR_FILE",
+  DELETE_A_FOLDER_OR_FILE: "DELETE_A_FOLDER_OR_FILE",
 };
 
 const reducer = (state, action) => {
@@ -121,12 +122,33 @@ const reducer = (state, action) => {
           transform: action.payload,
         },
       };
-    case ACTIONS.ADD_A_NEW_FOLDER:
-      const newFoldersAndFilesKeys = [
-        ...state.folderAndFilesKeys,
-        { folderName: action.payload.folderName },
-      ];
-      return { ...state, folderAndFilesKeys: newFoldersAndFilesKeys };
+    case ACTIONS.ADD_A_NEW_FOLDER_OR_FILE:
+      console.log(
+        "ADD_A_NEW_FOLDER_OR_FILE",
+        state.folderAndFilesKeys,
+        action.payload.folderId
+      );
+
+      const newArr = addNestedFolder(
+        state.folderAndFilesKeys,
+        action.payload.folderId,
+        {
+          name: action.payload.name,
+          id: Date.now(),
+          isFile: action.payload.isFile,
+          subFoldersAndFiles: action.payload.isFile ? undefined : [],
+        }
+      );
+      // const newFoldersAndFilesKeys = state.folderAndFilesKeys;
+      return { ...state, folderAndFilesKeys: newArr };
+
+    case ACTIONS.DELETE_A_FOLDER_OR_FILE:
+      return {
+        ...state,
+        folderAndFilesKeys: state.folderAndFilesKeys.filter(
+          (eachItem) => eachItem.id != action.payload
+        ),
+      };
     default:
       return state;
   }
@@ -154,7 +176,9 @@ export default function useBoardHook() {
     storedSnippets = JSON.parse(localStorage.getItem("snippets"));
     boardDimensions = JSON.parse(localStorage.getItem("boardDimensions"));
     folderAndFilesKeys = JSON.parse(localStorage.getItem("folderAndFilesKeys"));
-    currentFileDestination = localStorage.getItem("currentFileDestination");
+    currentFileDestination = JSON.parse(
+      localStorage.getItem("currentFileDestination")
+    );
 
     // if no stored values, then set some default values
     if (!storedSnippets) {
@@ -170,9 +194,14 @@ export default function useBoardHook() {
       };
     }
     if (!folderAndFilesKeys && !currentFileDestination) {
-      const defaultFile = { name: "default", id: Date.now(), isFile: true };
+      const defaultFile = {
+        name: "default222",
+        id: Date.now(),
+        isFile: true,
+        subFoldersAndFiles: undefined,
+      };
       folderAndFilesKeys = [defaultFile];
-      currentFileDestination = defaultFile.id;
+      currentFileDestination = defaultFile;
     }
     // if (!currentFileDestination) {
     //   currentFileDestination = "default";
@@ -197,7 +226,7 @@ export default function useBoardHook() {
       );
       localStorage.setItem(
         "currentFileDestination",
-        state.currentFileDestination
+        JSON.stringify(state.currentFileDestination)
       );
     }
   }, [state.folderAndFilesKeys, state.currentFileDestination]);
@@ -349,8 +378,17 @@ export default function useBoardHook() {
     }
   };
 
-  const addANewFolderOrFile = (folderName) => {
-    dispatch({ type: ACTIONS.ADD_A_NEW_FOLDER, payload: { folderName } });
+  const addANewFolderOrFile = (name, isFile, folderId) => {
+    console.log("how many times clicked?!");
+
+    dispatch({
+      type: ACTIONS.ADD_A_NEW_FOLDER_OR_FILE,
+      payload: { name, isFile, folderId },
+    });
+  };
+
+  const deleteAFolderOrFile = (id) => {
+    dispatch({ type: ACTIONS.DELETE_A_FOLDER_OR_FILE, payload: id });
   };
 
   return {
@@ -361,6 +399,6 @@ export default function useBoardHook() {
     deleteSnippet,
     updateSnippetTransform,
     updateWidthAndHeight,
-    actions: { addANewFolderOrFile },
+    actions: { addANewFolderOrFile, deleteAFolderOrFile },
   };
 }
