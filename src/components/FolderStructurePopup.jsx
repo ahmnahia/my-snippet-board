@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,25 +17,32 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { Input } from "@/components/ui/input";
 
 const traverseNestedArray = (arr, level, flattenedArray) => {
   arr.forEach((eachItem) => {
     flattenedArray.push({ ...eachItem, level });
     if (eachItem.subFoldersAndFiles) {
-      traverseNestedArray(eachItem.subFoldersAndFiles, level + 1, flattenedArray);
+      traverseNestedArray(
+        eachItem.subFoldersAndFiles,
+        level + 1,
+        flattenedArray
+      );
     }
   });
 };
-  
+
 export default function FolderStructurePopup({
   currentFileDestination,
   folderAndFilesKeys,
-  actions: { addANewFolderOrFile, deleteAFolderOrFile },
+  actions: { addANewFolderOrFile, deleteAFolderOrFile, editAFolderOrFileName },
 }) {
   const [currentSelectedFileOrFolder, setCurrentSelectedFileOrFolder] =
     useState(undefined);
   const [flattenedArray, setFlattenedArray] = useState([]);
-  console.log("folderAndFilesKeys: ", folderAndFilesKeys);
+  const [nameEdit, setNameEdit] = useState("");
+
+  console.log("currentSelectedFileOrFolder ", currentSelectedFileOrFolder);
 
   useEffect(() => {
     let temp = [];
@@ -46,6 +53,7 @@ export default function FolderStructurePopup({
   const ContextMenuWrapper = ({
     children,
     handleClick,
+    handleEdit,
     handleDelete,
     buttonStyles,
   }) => {
@@ -62,7 +70,7 @@ export default function FolderStructurePopup({
           </Button>
         </ContextMenuTrigger>
         <ContextMenuContent>
-          <ContextMenuItem>Edit</ContextMenuItem>
+          <ContextMenuItem onClick={handleEdit}>Edit</ContextMenuItem>
           <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
@@ -105,41 +113,93 @@ export default function FolderStructurePopup({
                     handleDelete={() => {
                       deleteAFolderOrFile(eachItem.id);
                     }}
+                    handleEdit={(e) => {
+                      e.stopPropagation();
+                      setCurrentSelectedFileOrFolder({
+                        ...eachItem,
+                        isEdit: true,
+                      });
+                      setNameEdit(eachItem.name);
+                    }}
                     buttonStyles={{
                       backgroundColor:
                         eachItem.id == currentSelectedFileOrFolder?.id
-                          ? "#a1a1aa"
+                          ? currentSelectedFileOrFolder.isEdit
+                            ? "transparent"
+                            : "#a1a1aa"
                           : null,
                       marginLeft: 28 * eachItem.level,
                     }}
                   >
                     {eachItem.isFile ? <FaCode /> : <FaFolder />}
-                    {eachItem.name}
+                    {currentSelectedFileOrFolder?.id == eachItem.id &&
+                    currentSelectedFileOrFolder?.isEdit ? (
+                      <Input
+                        type="text"
+                        className="bg-transparent border-none focus:outline-4 focus:outline-blue-500 w-fit"
+                        value={nameEdit}
+                        onChange={(e) => {
+                          setNameEdit(e.target.value);
+                        }}
+                        autoFocus
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            editAFolderOrFileName(eachItem.id, nameEdit);
+                            setNameEdit(false);
+                            setCurrentSelectedFileOrFolder(undefined);
+                          }
+                        }}
+                      />
+                    ) : (
+                      eachItem.name
+                    )}
                   </ContextMenuWrapper>
                 );
               })}
             </div>
           </div>
           <DialogFooter>
-            <Button
-              disabled={!currentSelectedFileOrFolder?.isFile}
-              variant="outline"
-              onClick={(e) => {}}
-            >
-              Open File
-            </Button>
-            <Button
-              disabled={currentSelectedFileOrFolder?.isFile}
-              onClick={(e) => {
-                addANewFolderOrFile(
-                  "New Folder",
-                  false,
-                  currentSelectedFileOrFolder?.id
-                );
-              }}
-            >
-              New Folder
-            </Button>
+            <div className="flex justify-between w-full">
+              <Button
+                disabled={
+                  !currentSelectedFileOrFolder?.isFile ||
+                  currentFileDestination.id == currentSelectedFileOrFolder?.id
+                }
+                variant="outline"
+                onClick={(e) => {}}
+              >
+                Open File
+              </Button>
+              <div className="flex gap-2">
+                <Button
+                  disabled={currentSelectedFileOrFolder?.isFile}
+                  onClick={(e) => {
+                    addANewFolderOrFile(
+                      "New File",
+                      true,
+                      currentSelectedFileOrFolder?.id
+                    );
+                  }}
+                >
+                  New File
+                </Button>
+                <Button
+                  disabled={currentSelectedFileOrFolder?.isFile}
+                  onClick={(e) => {
+                    addANewFolderOrFile(
+                      "New Folder",
+                      false,
+                      currentSelectedFileOrFolder?.id
+                    );
+                  }}
+                >
+                  New Folder
+                </Button>
+              </div>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

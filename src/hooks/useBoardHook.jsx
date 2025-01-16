@@ -3,7 +3,12 @@ import { useReducer, useEffect, useRef } from "react";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
 import { resizeDiv } from "@/scripts/resizing";
 import { boardSize } from "@/constants";
-import { getTranslateXY, addNestedFolder } from "@/scripts";
+import {
+  getTranslateXY,
+  addNestedFolder,
+  deleteNestedFolder,
+  editNestedFolderName,
+} from "@/scripts";
 
 const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
@@ -17,6 +22,7 @@ const ACTIONS = {
   UPDATE_BOARD_TRANSFORM: "UPDATE_BOARD_TRANSFORM",
   ADD_A_NEW_FOLDER_OR_FILE: "ADD_A_NEW_FOLDER_OR_FILE",
   DELETE_A_FOLDER_OR_FILE: "DELETE_A_FOLDER_OR_FILE",
+  EDIT_A_FOLDER_OR_FILE_NAME: "EDIT_A_FOLDER_OR_FILE_NAME",
 };
 
 const reducer = (state, action) => {
@@ -123,12 +129,6 @@ const reducer = (state, action) => {
         },
       };
     case ACTIONS.ADD_A_NEW_FOLDER_OR_FILE:
-      console.log(
-        "ADD_A_NEW_FOLDER_OR_FILE",
-        state.folderAndFilesKeys,
-        action.payload.folderId
-      );
-
       const newArr = addNestedFolder(
         state.folderAndFilesKeys,
         action.payload.folderId,
@@ -145,8 +145,18 @@ const reducer = (state, action) => {
     case ACTIONS.DELETE_A_FOLDER_OR_FILE:
       return {
         ...state,
-        folderAndFilesKeys: state.folderAndFilesKeys.filter(
-          (eachItem) => eachItem.id != action.payload
+        folderAndFilesKeys: deleteNestedFolder(
+          state.folderAndFilesKeys,
+          action.payload.folderId
+        ),
+      };
+    case ACTIONS.EDIT_A_FOLDER_OR_FILE_NAME:
+      return {
+        ...state,
+        folderAndFilesKeys: editNestedFolderName(
+          state.folderAndFilesKeys,
+          action.payload.folderId,
+          action.payload.name
         ),
       };
     default:
@@ -379,16 +389,21 @@ export default function useBoardHook() {
   };
 
   const addANewFolderOrFile = (name, isFile, folderId) => {
-    console.log("how many times clicked?!");
-
     dispatch({
       type: ACTIONS.ADD_A_NEW_FOLDER_OR_FILE,
       payload: { name, isFile, folderId },
     });
   };
 
-  const deleteAFolderOrFile = (id) => {
-    dispatch({ type: ACTIONS.DELETE_A_FOLDER_OR_FILE, payload: id });
+  const deleteAFolderOrFile = (folderId) => {
+    dispatch({ type: ACTIONS.DELETE_A_FOLDER_OR_FILE, payload: { folderId } });
+  };
+
+  const editAFolderOrFileName = (folderId, name) => {
+    dispatch({
+      type: ACTIONS.EDIT_A_FOLDER_OR_FILE_NAME,
+      payload: { folderId, name },
+    });
   };
 
   return {
@@ -399,6 +414,10 @@ export default function useBoardHook() {
     deleteSnippet,
     updateSnippetTransform,
     updateWidthAndHeight,
-    actions: { addANewFolderOrFile, deleteAFolderOrFile },
+    actions: {
+      addANewFolderOrFile,
+      deleteAFolderOrFile,
+      editAFolderOrFileName,
+    },
   };
 }
