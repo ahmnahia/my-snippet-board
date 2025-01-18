@@ -1,5 +1,5 @@
 "use client";
-import { useReducer, useEffect, useRef } from "react";
+import { useReducer, useEffect, useRef, use } from "react";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
 import { resizeDiv } from "@/scripts/resizing";
 import { boardSize } from "@/constants";
@@ -23,6 +23,8 @@ const ACTIONS = {
   ADD_A_NEW_FOLDER_OR_FILE: "ADD_A_NEW_FOLDER_OR_FILE",
   DELETE_A_FOLDER_OR_FILE: "DELETE_A_FOLDER_OR_FILE",
   EDIT_A_FOLDER_OR_FILE_NAME: "EDIT_A_FOLDER_OR_FILE_NAME",
+  CHANGE_FILE_DESTINATION: "CHANGE_FILE_DESTINATION",
+  UPDATE_SNIPPET_TITLE: "UPDATE_SNIPPET_TITLE",
 };
 
 const reducer = (state, action) => {
@@ -159,6 +161,23 @@ const reducer = (state, action) => {
           action.payload.name
         ),
       };
+
+    case ACTIONS.CHANGE_FILE_DESTINATION:
+      return { ...state, currentFileDestination: action.payload };
+
+    case ACTIONS.UPDATE_SNIPPET_TITLE:
+      return {
+        ...state,
+        snippets: state.snippets.map((eachSnippet) => {
+          if (eachSnippet.id == action.payload.snippetId) {
+            return {
+              ...eachSnippet,
+              title: action.payload.newTitle,
+            };
+          }
+          return eachSnippet;
+        }),
+      };
     default:
       return state;
   }
@@ -169,6 +188,7 @@ const reducer = (state, action) => {
 export default function useBoardHook() {
   const mousePosition = useRef({ x: undefined, y: undefined });
   const isBoardDragListenerSet = useRef(false);
+  const isCurrentFileDestinationChanged = useRef(false);
 
   const [state, dispatch] = useReducer(reducer, {
     snippets: undefined,
@@ -176,6 +196,51 @@ export default function useBoardHook() {
     folderAndFilesKeys: undefined,
     currentFileDestination: undefined,
   });
+
+  useEffect(() => {
+    // Dealing with local storage when a file destination is changed
+    if (
+      state.currentFileDestination &&
+      isCurrentFileDestinationChanged.current
+    ) {
+      console.log("is this called!? ");
+
+      const prevFileDestination = JSON.parse(
+        localStorage.getItem("currentFileDestination")
+      );
+      localStorage.setItem(
+        "currentFileDestination",
+        JSON.stringify(state.currentFileDestination)
+      );
+
+      let allSnippets = JSON.parse(localStorage.getItem("allSnippets"));
+      allSnippets = allSnippets ? allSnippets : {};
+      allSnippets[prevFileDestination.id] = {
+        snippets: state.snippets,
+        boardDimensions: state.boardDimensions,
+      };
+      allSnippets[state.currentFileDestination.id]?.snippets
+        ? localStorage.setItem(
+            "snippets",
+            JSON.stringify(
+              allSnippets[state.currentFileDestination.id].snippets
+            )
+          )
+        : localStorage.removeItem("snippets");
+
+      allSnippets[state.currentFileDestination.id]?.boardDimensions
+        ? localStorage.setItem(
+            "boardDimensions",
+            JSON.stringify(
+              allSnippets[state.currentFileDestination.id].boardDimensions
+            )
+          )
+        : localStorage.removeItem("boardDimensions");
+
+      localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
+      window.location.reload();
+    }
+  }, [state.currentFileDestination]);
 
   useEffect(() => {
     // Handles getting saved data and loading them into the state
@@ -328,7 +393,7 @@ export default function useBoardHook() {
                 id: "snippet-" + nextIdNumber,
                 title: "Snippet #" + nextIdNumber,
                 content: text,
-                language: "javascript",
+                language: "plaintext",
                 dimensions: {
                   top:
                     (boardDims.top * -1 + mousePosition.current.y) /
@@ -388,6 +453,13 @@ export default function useBoardHook() {
     }
   };
 
+  const updateSnippetTitle = (snippetId, newTitle) => {
+    dispatch({
+      type: ACTIONS.UPDATE_SNIPPET_TITLE,
+      payload: { snippetId, newTitle },
+    });
+  };
+
   const addANewFolderOrFile = (name, isFile, folderId) => {
     dispatch({
       type: ACTIONS.ADD_A_NEW_FOLDER_OR_FILE,
@@ -406,6 +478,14 @@ export default function useBoardHook() {
     });
   };
 
+  const changeFileDestination = (currentFileDestination) => {
+    isCurrentFileDestinationChanged.current = true;
+    dispatch({
+      type: ACTIONS.CHANGE_FILE_DESTINATION,
+      payload: currentFileDestination,
+    });
+  };
+
   return {
     state,
     dispatch,
@@ -418,6 +498,8 @@ export default function useBoardHook() {
       addANewFolderOrFile,
       deleteAFolderOrFile,
       editAFolderOrFileName,
+      changeFileDestination,
+      updateSnippetTitle
     },
   };
 }

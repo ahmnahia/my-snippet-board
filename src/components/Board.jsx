@@ -56,6 +56,7 @@ export default function Board() {
             deleteSnippet={deleteSnippet}
             updateSnippetTransform={updateSnippetTransform}
             updateWidthAndHeight={updateWidthAndHeight}
+            actions={actions}
           />
         ))}
       </div>

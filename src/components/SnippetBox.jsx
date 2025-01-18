@@ -12,6 +12,7 @@ import { prismLanguagesSorted, prismLanguages } from "@/constants/prismImports";
 import { resizeDiv } from "@/scripts/resizing";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
 import { snippetBoxHoverBorderColorLight } from "@/constants";
+import { Input } from "@/components/ui/input";
 
 export default function Snippet({
   id,
@@ -23,12 +24,14 @@ export default function Snippet({
   deleteSnippet,
   updateSnippetTransform,
   updateWidthAndHeight,
+  actions: { updateSnippetTitle },
 }) {
   useEffect(() => {
     Prism.highlightAll();
   }, [language]);
 
   const [isHovered, setIsHovered] = useState(false);
+  const [titleToEdit, setTitleToEdit] = useState({ id: undefined, string: "" });
   const isListenerSet = useRef(false);
 
   useEffect(() => {
@@ -80,8 +83,45 @@ export default function Snippet({
     >
       <div className="w-full flex justify-between bg-zinc-100 dark:bg-zinc-900 border-b-2 border-b-zinc-200 dark:border-b-zinc-700 px-5 py-2">
         <div>
-          <h5 className="">
-            <b>{title}</b>
+          <h5
+            className=""
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setTitleToEdit({ id, string: title });
+            }}
+          >
+            {titleToEdit.id ? (
+              <Input
+                type="text"
+                className="bg-transparent   w-fit h-[21px] font-bold dark:focus-visible:ring-0 dark:focus-visible:border-b-2 dark:focus-visible:border-b-zinc-300/95 rounded-none"
+                value={titleToEdit.string}
+                onChange={(e) => {
+                  setTitleToEdit({ id: id, string: e.target.value });
+                }}
+                autoFocus
+                onBlur={() => {
+                  updateSnippetTitle(
+                    id,
+                    titleToEdit.string == "" ? "Snippet" : titleToEdit.string
+                  );
+                  setTitleToEdit({ id: undefined, string: "" });
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    updateSnippetTitle(
+                      id,
+                      titleToEdit.string == "" ? "Snippet" : titleToEdit.string
+                    ); //needed cuz "Enter" doesn't trigger onBlur
+                    setTitleToEdit({ id: undefined, string: "" });
+                  }
+                }}
+              />
+            ) : (
+              <b>{title}</b>
+            )}
           </h5>
         </div>
         <div className="flex gap-3">
@@ -114,7 +154,7 @@ export default function Snippet({
                   .writeText(content)
                   .then(() => {})
                   .catch((e) => {
-                    console.log("Error copying the snippet");
+                    console.error("Error copying the snippet");
                   });
               }}
             />

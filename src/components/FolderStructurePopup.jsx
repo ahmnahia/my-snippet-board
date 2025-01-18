@@ -35,14 +35,17 @@ const traverseNestedArray = (arr, level, flattenedArray) => {
 export default function FolderStructurePopup({
   currentFileDestination,
   folderAndFilesKeys,
-  actions: { addANewFolderOrFile, deleteAFolderOrFile, editAFolderOrFileName },
+  actions: {
+    addANewFolderOrFile,
+    deleteAFolderOrFile,
+    editAFolderOrFileName,
+    changeFileDestination,
+  },
 }) {
   const [currentSelectedFileOrFolder, setCurrentSelectedFileOrFolder] =
     useState(undefined);
   const [flattenedArray, setFlattenedArray] = useState([]);
   const [nameEdit, setNameEdit] = useState("");
-
-  console.log("currentSelectedFileOrFolder ", currentSelectedFileOrFolder);
 
   useEffect(() => {
     let temp = [];
@@ -169,7 +172,9 @@ export default function FolderStructurePopup({
                   currentFileDestination.id == currentSelectedFileOrFolder?.id
                 }
                 variant="outline"
-                onClick={(e) => {}}
+                onClick={(e) => {
+                  changeFileDestination(currentSelectedFileOrFolder);
+                }}
               >
                 Open File
               </Button>

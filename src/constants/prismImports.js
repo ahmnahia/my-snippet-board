@@ -19,6 +19,7 @@ import "prismjs/components/prism-powershell";
 import "prismjs/themes/prism-tomorrow.css";
 
 export const prismLanguages = {
+  plaintext: { name: "Text" },
   javascript: { name: "JavaScript" },
   css: { name: "CSS" },
   html: { name: "HTML", doNotImport: true },
