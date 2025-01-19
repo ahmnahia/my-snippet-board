@@ -166,10 +166,12 @@ const reducer = (state, action) => {
       return { ...state, currentFileDestination: action.payload };
 
     case ACTIONS.UPDATE_SNIPPET_TITLE:
+      let currentTitle = "";
       return {
         ...state,
         snippets: state.snippets.map((eachSnippet) => {
           if (eachSnippet.id == action.payload.snippetId) {
+            currentTitle = eachSnippet.title;
             return {
               ...eachSnippet,
               title: action.payload.newTitle,
@@ -177,6 +179,7 @@ const reducer = (state, action) => {
           }
           return eachSnippet;
         }),
+        undoStack: [...state.undoStack, { ...action, newTitle: currentTitle }],
       };
     default:
       return state;
@@ -195,6 +198,8 @@ export default function useBoardHook() {
     scale: 1,
     folderAndFilesKeys: undefined,
     currentFileDestination: undefined,
+    undoStack: [],
+    redoStack: [],
   });
 
   useEffect(() => {
@@ -499,7 +504,7 @@ export default function useBoardHook() {
       deleteAFolderOrFile,
       editAFolderOrFileName,
       changeFileDestination,
-      updateSnippetTitle
+      updateSnippetTitle,
     },
   };
 }

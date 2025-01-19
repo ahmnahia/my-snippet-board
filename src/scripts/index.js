@@ -74,3 +74,35 @@ export const deleteNestedFolder = (arr, folderId) => {
       return eachItem;
     });
 };
+
+export const getLastUndoAction = (undoStack) => {
+  return undoStack[undoStack.length - 1];
+};
+
+export const preformAction = (action, undoStack, redoStack, currentAction) => {
+  if (!action.payload.isUndo && !action.payload.isRedo) {
+    if (undoStack.length >= 10) undoStack.shift();
+    undoStack.push(action);
+    redoStack = [];
+    return { undoStack, redoStack };
+  } else if (action.payload.isUndo) {
+    return undo(currentAction, undoStack, redoStack);
+  }
+};
+
+export const undo = (currentAction, undoStack, redoStack) => {
+  if (undoStack.length > 0) {
+    if (redoStack.length >= 10) redoStack.shift();
+    redoStack.push(currentAction);
+    const newAction = undoStack.pop();
+    return { undoStack, redoStack, newAction };
+  }
+};
+
+export const redo = (currentAction, undoStack, redoStack) => {
+  if (redoStack.length > 0) {
+    undoStack.push(currentAction);
+    const newAction = redoStack.pop();
+    return { undoStack, redoStack, newAction };
+  }
+};

@@ -3,6 +3,7 @@ import { boardSize } from "@/constants";
 import SnippetBox from "./SnippetBox";
 import useBoardHook from "@/hooks/useBoardHook";
 import BoardNavBar from "./BoardNavBar";
+import useUndoRedoHook from "@/hooks/useUndoRedoHook";
 
 export default function Board() {
   const {
@@ -12,13 +13,18 @@ export default function Board() {
       boardDimensions,
       currentFileDestination,
       folderAndFilesKeys,
+      undoStack,
+      redoStack,
     },
+    dispatch,
     changeSnippetLanguage,
     deleteSnippet,
     updateSnippetTransform,
     updateWidthAndHeight,
-    actions
+    actions,
   } = useBoardHook();
+
+  const {} = useUndoRedoHook(dispatch, undoStack, redoStack, snippets);
 
   if (!snippets || !boardDimensions || !currentFileDestination) {
     return <h1> Loading ...</h1>;
