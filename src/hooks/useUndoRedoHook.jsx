@@ -7,9 +7,22 @@ export default function useUndoRedoHook(
   snippets
 ) {
   const handleUndo = () => {
-    dispatch({...undoStack.pop(), isUndo: true});
-    dispatch({});
+    if (undoStack.length == 0) return;
+    const action = undoStack.pop();
+    dispatch({
+      type: action.type,
+      payload: { ...action.payload, isUndo: true, isRedo: false, undoStack },
+    });
   };
 
-  return {};
+  const handleRedo = () => {
+    if (redoStack.length == 0) return;
+    const action = redoStack.pop();
+    dispatch({
+      type: action.type,
+      payload: { ...action.payload, isRedo: true, isUndo: false, redoStack },
+    });
+  };
+
+  return { handleUndo, handleRedo };
 }

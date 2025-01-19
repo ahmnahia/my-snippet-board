@@ -24,7 +24,15 @@ export default function Board() {
     actions,
   } = useBoardHook();
 
-  const {} = useUndoRedoHook(dispatch, undoStack, redoStack, snippets);
+  console.log("undoStack", undoStack);
+  console.log("redoStack", redoStack);
+
+  const { handleUndo, handleRedo } = useUndoRedoHook(
+    dispatch,
+    undoStack,
+    redoStack,
+    snippets
+  );
 
   if (!snippets || !boardDimensions || !currentFileDestination) {
     return <h1> Loading ...</h1>;
@@ -35,7 +43,7 @@ export default function Board() {
       <BoardNavBar
         currentFileDestination={currentFileDestination}
         folderAndFilesKeys={folderAndFilesKeys}
-        actions={actions}
+        actions={{ ...actions, handleUndo, handleRedo }}
       />
       <div
         className={`z-0 absolute board-bg hover:cursor-grab dark:board-bg-dark`}

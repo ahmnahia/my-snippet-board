@@ -41,10 +41,20 @@ export default function BoardNavBar({
         </div>
         <div className="flex gap-2">
           <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
-            <MdOutlineUndo className="text-4xl" />
+            <MdOutlineUndo
+              className="text-4xl"
+              onClick={() => {
+                actions.handleUndo();
+              }}
+            />
           </div>
           <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
-            <MdOutlineRedo className="text-4xl" />
+            <MdOutlineRedo
+              className="text-4xl"
+              onClick={() => {
+                actions.handleRedo();
+              }}
+            />
           </div>
         </div>
         <div className="flex gap-3 items-center">

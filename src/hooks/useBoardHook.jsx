@@ -179,7 +179,26 @@ const reducer = (state, action) => {
           }
           return eachSnippet;
         }),
-        undoStack: [...state.undoStack, { ...action, newTitle: currentTitle }],
+        undoStack: action.payload.isUndo
+          ? action.payload.undoStack
+          : [
+              ...state.undoStack,
+              {
+                type: action.type,
+                payload: { ...action.payload, newTitle: currentTitle },
+              },
+            ],
+        redoStack: action.payload.isUndo
+          ? [
+              ...state.redoStack,
+              {
+                type: action.type,
+                payload: { ...action.payload, newTitle: currentTitle },
+              },
+            ]
+          : action.payload.isRedo
+          ? action.payload.redoStack
+          : [],
       };
     default:
       return state;
