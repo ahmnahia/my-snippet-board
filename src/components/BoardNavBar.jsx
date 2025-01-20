@@ -5,24 +5,17 @@ import { MdOutlineRedo } from "react-icons/md";
 import { IoSearch } from "react-icons/io5";
 import ThemeToggle from "./ThemeToggle";
 import FolderStructurePopup from "./FolderStructurePopup";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarTrigger,
-  MenubarSub,
-  MenubarSubTrigger,
-  MenubarSubContent,
-} from "@/components/ui/menubar";
 
 export default function BoardNavBar({
   currentFileDestination,
   folderAndFilesKeys,
   actions,
+  redoStack,
+  undoStack,
 }) {
+  console.log("redostack: ", redoStack);
+  console.log("undoStack: ", undoStack);
+
   return (
     <div className="z-50 w-full flex justify-center fixed top-10">
       <div className="w-[1000px] h-[50px] bg-transparent border border-zinc-400 rounded-xl flex justify-between items-center px-2">
@@ -42,15 +35,19 @@ export default function BoardNavBar({
         <div className="flex gap-2">
           <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
             <MdOutlineUndo
+              disabled={undoStack.length == 0}
               className="text-4xl"
               onClick={() => {
                 actions.handleUndo();
               }}
+              style={{ opacity: undoStack.length == 0 ? 0.5 : 1 }}
             />
           </div>
           <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
             <MdOutlineRedo
               className="text-4xl"
+              disabled={redoStack.length == 0}
+              style={{ opacity: redoStack.length == 0 ? 0.5 : 1 }}
               onClick={() => {
                 actions.handleRedo();
               }}

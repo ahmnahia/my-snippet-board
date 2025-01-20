@@ -53,11 +53,63 @@ const reducer = (state, action) => {
       });
       return { ...state, snippets: newSnippets };
     case ACTIONS.DELETE_SNIPPET:
+      let deletedSnippet = undefined;
+      let deletedSnippetIdx = 0;
       return {
         ...state,
-        snippets: state.snippets.filter(
-          (eachSnippet) => eachSnippet.id != action.payload
-        ),
+        snippets: action.payload.isUndo
+          ? (() => {
+              if (
+                state.snippets[action.payload.deletedSnippetIdx]?.id ==
+                action.payload.deletedSnippet?.id
+              )
+                return [...state.snippets];
+              state.snippets.splice(
+                action.payload.deletedSnippetIdx,
+                0,
+                action.payload.deletedSnippet
+              ); // splice returns an array with the deleted elements not the updated array
+              return [...state.snippets]; // Return the updated array as a new array to cause rerenders in useEffects
+            })()
+          : state.snippets.filter((eachSnippet, idx) => {
+              if (
+                eachSnippet.id ==
+                (action.payload.isRedo
+                  ? action.payload.deletedSnippetIdx
+                  : action.payload)
+              ) {
+                deletedSnippet = eachSnippet;
+                deletedSnippetIdx = idx;
+              }
+              return (
+                eachSnippet.id !=
+                (action.payload.isRedo
+                  ? action.payload.deletedSnippetIdx
+                  : action.payload)
+              );
+            }),
+        undoStack: action.payload.isUndo
+          ? action.payload.undoStack
+          : [
+              ...state.undoStack,
+              {
+                type: action.type,
+                payload: { deletedSnippet, deletedSnippetIdx },
+              },
+            ],
+        redoStack: action.payload.isUndo
+          ? [
+              ...state.redoStack,
+              {
+                type: action.type,
+                payload: {
+                  deletedSnippetIdx: action.payload.deletedSnippet.id,
+                },
+              },
+            ]
+          : action.payload.isRedo
+          ? action.payload.redoStack
+          : [],
       };
 
     case ACTIONS.UPDATE_WIDTH_AND_HEIGHT:
@@ -107,10 +159,12 @@ const reducer = (state, action) => {
       };
 
     case ACTIONS.UPDATE_SNIPPET_TRANSFORM:
+      let currentSnippetTransform = undefined;
       return {
         ...state,
         snippets: state.snippets.map((eachSnippet) => {
           if (eachSnippet.id == action.payload.snippetId) {
+            currentSnippetTransform = eachSnippet.dimensions.transform;
             return {
               ...eachSnippet,
               dimensions: {
@@ -121,6 +175,32 @@ const reducer = (state, action) => {
           }
           return eachSnippet;
         }),
+        undoStack: action.payload.isUndo
+          ? action.payload.undoStack
+          : [
+              ...state.undoStack,
+              {
+                type: action.type,
+                payload: {
+                  ...action.payload,
+                  transformString: currentSnippetTransform,
+                },
+              },
+            ],
+        redoStack: action.payload.isUndo
+          ? [
+              ...state.redoStack,
+              {
+                type: action.type,
+                payload: {
+                  ...action.payload,
+                  transformString: currentSnippetTransform,
+                },
+              },
+            ]
+          : action.payload.isRedo
+          ? action.payload.redoStack
+          : [],
       };
     case ACTIONS.UPDATE_BOARD_TRANSFORM:
       return {
@@ -227,8 +307,6 @@ export default function useBoardHook() {
       state.currentFileDestination &&
       isCurrentFileDestinationChanged.current
     ) {
-      console.log("is this called!? ");
-
       const prevFileDestination = JSON.parse(
         localStorage.getItem("currentFileDestination")
       );
@@ -346,6 +424,7 @@ export default function useBoardHook() {
 
   useEffect(() => {
     if (state.snippets) {
+      console.log("did snippets change?!");
       // save the snippet in local storage for persistence
       localStorage.setItem("snippets", JSON.stringify(state.snippets));
     }

@@ -1,3 +1,4 @@
+"use client";
 import { useEffect } from "react";
 
 export default function useUndoRedoHook(
@@ -8,6 +9,9 @@ export default function useUndoRedoHook(
 ) {
   const handleUndo = () => {
     if (undoStack.length == 0) return;
+    else if (undoStack.length > 20) {
+      undoStack.shift();
+    }
     const action = undoStack.pop();
     dispatch({
       type: action.type,
@@ -17,6 +21,9 @@ export default function useUndoRedoHook(
 
   const handleRedo = () => {
     if (redoStack.length == 0) return;
+    else if (redoStack.length > 20) {
+      redoStack.shift();
+    }
     const action = redoStack.pop();
     dispatch({
       type: action.type,

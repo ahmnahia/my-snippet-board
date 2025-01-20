@@ -24,9 +24,6 @@ export default function Board() {
     actions,
   } = useBoardHook();
 
-  console.log("undoStack", undoStack);
-  console.log("redoStack", redoStack);
-
   const { handleUndo, handleRedo } = useUndoRedoHook(
     dispatch,
     undoStack,
@@ -44,6 +41,8 @@ export default function Board() {
         currentFileDestination={currentFileDestination}
         folderAndFilesKeys={folderAndFilesKeys}
         actions={{ ...actions, handleUndo, handleRedo }}
+        undoStack={undoStack}
+        redoStack={redoStack}
       />
       <div
         className={`z-0 absolute board-bg hover:cursor-grab dark:board-bg-dark`}
