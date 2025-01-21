@@ -15,24 +15,24 @@ export default function ThemeToggle() {
   return (
     <>
       <div
-        className={`text-2xl cursor-pointer text-gray-500  ${
+        className={`text-xl cursor-pointer text-gray-500  ${
           theme == "dark" ? "hidden" : "block"
         }`}
         onClick={() => {
           setTheme("dark");
         }}
       >
-        <BsFillMoonStarsFill className=""/>
+        <BsFillMoonStarsFill className="text-xl"/>
       </div>{" "}
       <div
-        className={`text-2xl cursor-pointer text-orange-300 ${
+        className={`text-xl cursor-pointer text-orange-300 ${
           theme == "dark" ? "block" : "hidden"
         }`}
         onClick={() => {
           setTheme("light");
         }}
       >
-        <FaSun />
+        <FaSun className=""/>
       </div>
     </>
   );

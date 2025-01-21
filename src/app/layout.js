@@ -1,5 +1,6 @@
-import "./globals.css";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeProvider } from "next-themes";
+import "./globals.css";
 
 export const metadata = {
   title: "Create Next App",
@@ -10,9 +11,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={` antialiased`}>
-        <ThemeProvider attribute={"class"} defaultTheme="dark">
-          {children}
-        </ThemeProvider>
+        <SidebarProvider>
+          <ThemeProvider attribute={"class"} defaultTheme="dark">
+            {children}
+          </ThemeProvider>
+        </SidebarProvider>
       </body>
     </html>
   );

@@ -1,10 +1,16 @@
 "use client";
-import { MdOutlineDarkMode } from "react-icons/md";
 import { MdOutlineUndo } from "react-icons/md";
 import { MdOutlineRedo } from "react-icons/md";
-import { IoSearch } from "react-icons/io5";
 import ThemeToggle from "./ThemeToggle";
 import FolderStructurePopup from "./FolderStructurePopup";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { SidebarTrigger } from "./ui/sidebar";
+import { AppSidebar } from "./AppSidebar";
 
 export default function BoardNavBar({
   currentFileDestination,
@@ -12,59 +18,77 @@ export default function BoardNavBar({
   actions,
   redoStack,
   undoStack,
+  snippets,
 }) {
   console.log("redostack: ", redoStack);
   console.log("undoStack: ", undoStack);
 
   return (
     <div className="z-50 w-full flex justify-center fixed top-10">
-      <div className="w-[1000px] h-[50px] bg-transparent border border-zinc-400 rounded-xl flex justify-between items-center px-2">
-        <div>
-          <div className="my-1 flex items-center border-[1px] border-zinc-200 px-2 rounded-lg max-w-[300px] bg-zinc-50/60 dark:bg-zinc-800/60 ">
-            <label htmlFor="search-input">
-              <IoSearch className="text-xl me-2 max-sm:text-xl max-sm:me-0" />
-            </label>
-            <input
-              id="search-input"
-              type="text"
-              className="p-3 bg-transparent outline-none text-xs"
-              placeholder="Search for snippets."
-            />
-          </div>
+      <div className="w-[700px] h-[50px] bg-transparent border border-zinc-400 rounded-xl flex justify-between items-center px-2">
+        <div className="">
+
+          <AppSidebar snippets={snippets} />
+          <SidebarTrigger className="relative"/>
         </div>
         <div className="flex gap-2">
-          <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
-            <MdOutlineUndo
-              disabled={undoStack.length == 0}
-              className="text-4xl"
-              onClick={() => {
-                actions.handleUndo();
-              }}
-              style={{ opacity: undoStack.length == 0 ? 0.5 : 1 }}
-            />
-          </div>
-          <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
-            <MdOutlineRedo
-              className="text-4xl"
-              disabled={redoStack.length == 0}
-              style={{ opacity: redoStack.length == 0 ? 0.5 : 1 }}
-              onClick={() => {
-                actions.handleRedo();
-              }}
-            />
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                  <MdOutlineUndo
+                    disabled={undoStack.length == 0}
+                    className="text-2xl"
+                    onClick={() => {
+                      actions.handleUndo();
+                    }}
+                    style={{ opacity: undoStack.length == 0 ? 0.5 : 1 }}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Undo (CTRL + Z)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                  <MdOutlineRedo
+                    className="text-2xl"
+                    disabled={redoStack.length == 0}
+                    style={{ opacity: redoStack.length == 0 ? 0.5 : 1 }}
+                    onClick={() => {
+                      actions.handleRedo();
+                    }}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Redo (CTRL + Y)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="flex gap-3 items-center">
-          <div>
-            <FolderStructurePopup
-              currentFileDestination={currentFileDestination}
-              folderAndFilesKeys={folderAndFilesKeys}
-              actions={actions}
-            />
-          </div>
-          <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 p-2">
-            {/* <MdOutlineDarkMode className="text-4xl" /> */}
-
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <FolderStructurePopup
+                    currentFileDestination={currentFileDestination}
+                    folderAndFilesKeys={folderAndFilesKeys}
+                    actions={actions}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Current Opened File</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 p-1">
             <ThemeToggle />
           </div>
         </div>

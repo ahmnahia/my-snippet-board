@@ -1,15 +1,18 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function useUndoRedoHook(
   dispatch,
   undoStack,
   redoStack,
-  snippets
 ) {
-  const handleUndo = () => {
-    if (undoStack.length == 0) return;
-    else if (undoStack.length > 20) {
+  const handleUndoRef = useRef();
+  const handleRedoRef = useRef();
+
+  // Keeping the latest version of handleUndo in the ref
+  handleUndoRef.current = () => {
+    if (undoStack.length === 0) return;
+    if (undoStack.length > 20) {
       undoStack.shift();
     }
     const action = undoStack.pop();
@@ -19,7 +22,7 @@ export default function useUndoRedoHook(
     });
   };
 
-  const handleRedo = () => {
+  handleRedoRef.current = () => {
     if (redoStack.length == 0) return;
     else if (redoStack.length > 20) {
       redoStack.shift();
@@ -30,6 +33,30 @@ export default function useUndoRedoHook(
       payload: { ...action.payload, isRedo: true, isUndo: false, redoStack },
     });
   };
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (
+        (event.ctrlKey && event.key == "Z") ||
+        (event.ctrlKey && event.key == "z")
+      ) {
+        handleUndoRef.current();
+      } else if (
+        (event.ctrlKey && event.key == "Y") ||
+        (event.ctrlKey && event.key == "y")
+      ) {
+        handleRedoRef.current();
+      }
+    };
 
-  return { handleUndo, handleRedo };
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  return {
+    handleUndo: handleUndoRef.current,
+    handleRedo: handleRedoRef.current,
+  };
 }

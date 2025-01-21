@@ -43,6 +43,7 @@ export default function Board() {
         actions={{ ...actions, handleUndo, handleRedo }}
         undoStack={undoStack}
         redoStack={redoStack}
+        snippets={snippets}
       />
       <div
         className={`z-0 absolute board-bg hover:cursor-grab dark:board-bg-dark`}
