@@ -1,3 +1,5 @@
+import { getTranslateXY } from ".";
+
 export function dragElement(elmnt, updateSnippetTransform) {
   let pos1 = 0,
     pos2 = 0,
@@ -20,6 +22,15 @@ export function dragElement(elmnt, updateSnippetTransform) {
     e = e || window.event;
     // e.preventDefault();
 
+    if (dragTarget.id === "board") {
+      //this is to use current transform values instead of always starting from 0, 0
+      const currentBoardTranslateXY = getTranslateXY(
+        dragTarget.style.transform
+      );
+      currentX = currentBoardTranslateXY[0];
+      currentY = currentBoardTranslateXY[1];
+    }
+
     pos3 = e.clientX;
     pos4 = e.clientY;
 
@@ -39,6 +50,15 @@ export function dragElement(elmnt, updateSnippetTransform) {
 
     e = e || window.event;
     // e.preventDefault();
+
+    if (dragTarget.id === "board") {
+      //this is to use current transform values instead of always starting from 0, 0
+      const currentBoardTranslateXY = getTranslateXY(
+        dragTarget.style.transform
+      );
+      currentX = currentBoardTranslateXY[0];
+      currentY = currentBoardTranslateXY[1];
+    }
 
     pos3 = e.touches[0].clientX;
     pos4 = e.touches[0].clientY;

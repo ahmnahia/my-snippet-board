@@ -28,7 +28,7 @@ export default function BoardNavBar({
       <div className="w-[700px] h-[50px] bg-transparent border border-zinc-400 rounded-xl flex justify-between items-center px-2">
         <div className="">
 
-          <AppSidebar snippets={snippets} />
+          <AppSidebar snippets={snippets} updateBoardView={actions.updateBoardView}/>
           <SidebarTrigger className="relative"/>
         </div>
         <div className="flex gap-2">

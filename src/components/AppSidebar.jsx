@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar";
 
-export function AppSidebar({ snippets }) {
+export function AppSidebar({ snippets, updateBoardView }) {
   //   const { open } = useSidebar();
   const [filteredSnippets, setFilteredSnippets] = useState(undefined);
   const [searchString, setSearchString] = useState("");
@@ -48,6 +48,9 @@ export function AppSidebar({ snippets }) {
                 {snippets.map((eachSnippet) => (
                   <SidebarMenuItem
                     key={eachSnippet.id}
+                    onClick={() => {
+                      updateBoardView(eachSnippet.dimensions);
+                    }}
                     className="mt-2 border border-zinc-400 p-2 rounded-lg overflow-hidden max-h-[100px] hover:cursor-pointer hover:opacity-70"
                   >
                     <div>

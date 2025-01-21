@@ -589,6 +589,29 @@ export default function useBoardHook() {
     });
   };
 
+  const updateBoardView = (snippetDimensions) => {
+    console.log(snippetDimensions);
+    
+    const snippetTransformXY = getTranslateXY(snippetDimensions.transform);
+    const newBoardDimensions = {
+      transform: `translate(${
+        (snippetDimensions.left - snippetTransformXY[0]) * -1 -
+        state.boardDimensions.left +
+        window.innerWidth / 2 -
+        snippetDimensions.width / 2
+      }px, ${
+        (snippetDimensions.top - snippetTransformXY[1]) * -1 -
+        state.boardDimensions.top +
+        window.innerHeight / 2 -
+        snippetDimensions.height / 2
+      }px)`,
+    };
+    dispatch({
+      type: ACTIONS.UPDATE_BOARD_TRANSFORM,
+      payload: newBoardDimensions.transform,
+    });
+  };
+
   return {
     state,
     dispatch,
@@ -603,6 +626,7 @@ export default function useBoardHook() {
       editAFolderOrFileName,
       changeFileDestination,
       updateSnippetTitle,
+      updateBoardView,
     },
   };
 }
