@@ -20,8 +20,6 @@ export default function BoardNavBar({
   undoStack,
   snippets,
 }) {
-  console.log("redostack: ", redoStack);
-  console.log("undoStack: ", undoStack);
 
   return (
     <div className="z-50 w-full flex justify-center fixed top-10">

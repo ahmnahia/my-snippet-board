@@ -1,13 +1,13 @@
 "use client";
 import { useReducer, useEffect, useRef, use } from "react";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
-import { resizeDiv } from "@/scripts/resizing";
 import { boardSize } from "@/constants";
 import {
   getTranslateXY,
   addNestedFolder,
   deleteNestedFolder,
   editNestedFolderName,
+  getNestedFoldersNFilesIds,
 } from "@/scripts";
 
 const ACTIONS = {
@@ -424,7 +424,6 @@ export default function useBoardHook() {
 
   useEffect(() => {
     if (state.snippets) {
-      console.log("did snippets change?!");
       // save the snippet in local storage for persistence
       localStorage.setItem("snippets", JSON.stringify(state.snippets));
     }
@@ -571,6 +570,13 @@ export default function useBoardHook() {
   };
 
   const deleteAFolderOrFile = (folderId) => {
+    const allSnippets = JSON.parse(localStorage.getItem("allSnippets"));
+    const arrOfIds = [];
+    getNestedFoldersNFilesIds(state.folderAndFilesKeys, folderId, arrOfIds);
+    arrOfIds.forEach((eachId) => {
+      if (allSnippets[eachId]) delete allSnippets[eachId];
+    });
+    localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
     dispatch({ type: ACTIONS.DELETE_A_FOLDER_OR_FILE, payload: { folderId } });
   };
 
@@ -590,17 +596,15 @@ export default function useBoardHook() {
   };
 
   const updateBoardView = (snippetDimensions) => {
-    console.log(snippetDimensions);
-    
     const snippetTransformXY = getTranslateXY(snippetDimensions.transform);
     const newBoardDimensions = {
       transform: `translate(${
-        (snippetDimensions.left - snippetTransformXY[0]) * -1 -
+        (snippetDimensions.left + snippetTransformXY[0]) * -1 -
         state.boardDimensions.left +
         window.innerWidth / 2 -
         snippetDimensions.width / 2
       }px, ${
-        (snippetDimensions.top - snippetTransformXY[1]) * -1 -
+        (snippetDimensions.top + snippetTransformXY[1]) * -1 -
         state.boardDimensions.top +
         window.innerHeight / 2 -
         snippetDimensions.height / 2

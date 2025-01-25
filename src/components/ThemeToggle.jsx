@@ -22,7 +22,7 @@ export default function ThemeToggle() {
           setTheme("dark");
         }}
       >
-        <BsFillMoonStarsFill className="text-xl"/>
+        <BsFillMoonStarsFill className="text-xl" />
       </div>{" "}
       <div
         className={`text-xl cursor-pointer text-orange-300 ${
@@ -32,7 +32,7 @@ export default function ThemeToggle() {
           setTheme("light");
         }}
       >
-        <FaSun className=""/>
+        <FaSun className="" />
       </div>
     </>
   );

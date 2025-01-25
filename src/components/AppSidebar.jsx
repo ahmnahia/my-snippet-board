@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useDeferredValue } from "react";
 import { IoSearch } from "react-icons/io5";
 import {
   Sidebar,
@@ -10,17 +10,25 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useSidebar } from "@/components/ui/sidebar";
 
 export function AppSidebar({ snippets, updateBoardView }) {
   //   const { open } = useSidebar();
-  const [filteredSnippets, setFilteredSnippets] = useState(undefined);
+  const [filteredSnippets, setFilteredSnippets] = useState(snippets);
   const [searchString, setSearchString] = useState("");
+  const deferredsearchString = useDeferredValue(searchString);
 
   useEffect(() => {
-    if (!searchString) {
-      setFilteredSnippets(snippets);
-    }
+    setFilteredSnippets(
+      snippets.filter(
+        (es) =>
+          es.title.toLowerCase().includes(deferredsearchString.toLowerCase()) ||
+          es.content.toLowerCase().includes(deferredsearchString.toLowerCase())
+      )
+    );
+  }, [deferredsearchString]);
+
+  useEffect(() => {
+    setFilteredSnippets(snippets);
   }, [snippets]);
 
   return (
@@ -41,11 +49,14 @@ export function AppSidebar({ snippets, updateBoardView }) {
                       id="search-input"
                       type="text"
                       className="p-3 bg-transparent outline-none text-xs"
-                      placeholder="Search for snippets."
+                      placeholder="Search for snippets"
+                      onChange={(e) => {
+                        setSearchString(e.target.value);
+                      }}
                     />
                   </div>
                 </SidebarMenuItem>
-                {snippets.map((eachSnippet) => (
+                {filteredSnippets.map((eachSnippet) => (
                   <SidebarMenuItem
                     key={eachSnippet.id}
                     onClick={() => {

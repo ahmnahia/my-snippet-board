@@ -16,7 +16,8 @@ import "prismjs/components/prism-swift";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-yaml";
 import "prismjs/components/prism-powershell";
-import "prismjs/themes/prism-tomorrow.css";
+// import "prismjs/themes/prism-tomorrow.css"; 
+// import "prismjs/themes/prism-coy.css"; 
 
 export const prismLanguages = {
   plaintext: { name: "Text" },
@@ -50,3 +51,13 @@ export const prismLanguagesSorted = sorted.map((eachKey) => ({
   prismKey: eachKey,
   name: prismLanguages[eachKey].name,
 }));
+
+export const loadPrismTheme = (isDarkMode) => {
+  // const theme = isDarkMode
+  //   ?  // Dark theme
+  //   : "prismjs/themes/prism-coy.css"; // Light theme
+
+  import("prismjs/themes/prism-tomorrow.css").then(() => {
+    console.log(`${theme} theme loaded!`);
+  });
+};    

@@ -11,8 +11,8 @@ import Prism from "prismjs";
 import { prismLanguagesSorted, prismLanguages } from "@/constants/prismImports";
 import { resizeDiv } from "@/scripts/resizing";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
-import { snippetBoxHoverBorderColorLight } from "@/constants";
 import { Input } from "@/components/ui/input";
+import { useTheme } from "next-themes";
 
 export default function Snippet({
   id,
@@ -33,6 +33,8 @@ export default function Snippet({
   const [isHovered, setIsHovered] = useState(false);
   const [titleToEdit, setTitleToEdit] = useState({ id: undefined, string: "" });
   const isListenerSet = useRef(false);
+  const { theme } = useTheme();
+  const isThemeSet = useRef(false);
 
   useEffect(() => {
     //listeners to resize and drag the snippet
@@ -58,6 +60,19 @@ export default function Snippet({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isHovered]);
+
+  useEffect(() => {
+    if (isThemeSet.current && isThemeSet.current != theme)
+      window.location.reload();
+    if (theme == "dark") {
+      import("prismjs/themes/prism-tomorrow.css").then(() => {
+        isThemeSet.current = "dark";
+      });
+    } else
+      import("prismjs/themes/prism-coy.css").then(() => {
+        isThemeSet.current = "light";
+      });
+  }, [theme]);
 
   return (
     <div

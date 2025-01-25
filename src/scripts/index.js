@@ -59,6 +59,8 @@ export const editNestedFolderName = (arr, folderId, name) => {
 };
 
 export const deleteNestedFolder = (arr, folderId) => {
+  console.log("File/FOLDER ID deleted: ", folderId);
+
   return arr
     .filter((eachItem) => eachItem.id !== folderId) // Filter out the item with the matching ID
     .map((eachItem) => {
@@ -73,6 +75,39 @@ export const deleteNestedFolder = (arr, folderId) => {
       }
       return eachItem;
     });
+};
+
+export const getNestedFoldersNFilesIds = (folderAndFilesKeys, targetId, arrOfIds) => {
+  folderAndFilesKeys.forEach((eachItem) => {
+    // If we find the target ID
+    if (eachItem.id === targetId) {
+      arrOfIds.push(eachItem.id);
+
+      // If it's a folder, collect all its children recursively
+      if (!eachItem.isFile && eachItem.subFoldersAndFiles) {
+        getAllChildIds(eachItem.subFoldersAndFiles, arrOfIds);
+      }
+    }
+
+    // Continue traversing into folders if not the target ID
+    if (!eachItem.isFile && eachItem.subFoldersAndFiles) {
+      getNestedFoldersNFilesIds(
+        eachItem.subFoldersAndFiles,
+        targetId,
+        arrOfIds
+      );
+    }
+  });
+};
+
+// Helper function to collect all child IDs of a folder
+const getAllChildIds = (folderContents, arrOfIds) => {
+  folderContents.forEach((item) => {
+    arrOfIds.push(item.id); 
+    if (!item.isFile && item.subFoldersAndFiles) {
+      getAllChildIds(item.subFoldersAndFiles, arrOfIds); // Recursively add child IDs
+    }
+  });
 };
 
 export const getLastUndoAction = (undoStack) => {
