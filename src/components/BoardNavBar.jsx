@@ -1,6 +1,6 @@
 "use client";
-import { MdOutlineUndo } from "react-icons/md";
-import { MdOutlineRedo } from "react-icons/md";
+import { MdOutlineUndo , MdOutlineRedo} from "react-icons/md";
+import { CgExport, CgImport  } from "react-icons/cg";
 import ThemeToggle from "./ThemeToggle";
 import FolderStructurePopup from "./FolderStructurePopup";
 import {
@@ -33,7 +33,7 @@ export default function BoardNavBar({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                <div className=" rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
                   <MdOutlineUndo
                     disabled={undoStack.length == 0}
                     className="text-2xl"
@@ -52,7 +52,7 @@ export default function BoardNavBar({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                <div className=" rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
                   <MdOutlineRedo
                     className="text-2xl"
                     disabled={redoStack.length == 0}
@@ -65,6 +65,36 @@ export default function BoardNavBar({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Redo (CTRL + Y)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className=" rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                  <CgExport 
+                    className="text-xl"
+                    style={{ }}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Export</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className=" rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                  <CgImport  
+                    className="text-xl"
+                    style={{ }}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Import</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

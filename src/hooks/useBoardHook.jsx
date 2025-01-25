@@ -9,6 +9,7 @@ import {
   editNestedFolderName,
   getNestedFoldersNFilesIds,
 } from "@/scripts";
+import { set, get, del, setMany } from "idb-keyval";
 
 const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
@@ -303,109 +304,143 @@ export default function useBoardHook() {
 
   useEffect(() => {
     // Dealing with local storage when a file destination is changed
-    if (
-      state.currentFileDestination &&
-      isCurrentFileDestinationChanged.current
-    ) {
-      const prevFileDestination = JSON.parse(
-        localStorage.getItem("currentFileDestination")
-      );
-      localStorage.setItem(
-        "currentFileDestination",
-        JSON.stringify(state.currentFileDestination)
-      );
+    const handleFileDestChange = async () => {
+      if (
+        state.currentFileDestination &&
+        isCurrentFileDestinationChanged.current
+      ) {
+        // const prevFileDestination = JSON.parse(
+        //   localStorage.getItem("currentFileDestination")
+        // );
+        // localStorage.setItem(
+        //   "currentFileDestination",
+        //   JSON.stringify(state.currentFileDestination)
+        // );
+        const prevFileDestination = await get("currentFileDestination"); //indexdb
+        await set("currentFileDestination");
 
-      let allSnippets = JSON.parse(localStorage.getItem("allSnippets"));
-      allSnippets = allSnippets ? allSnippets : {};
-      allSnippets[prevFileDestination.id] = {
-        snippets: state.snippets,
-        boardDimensions: state.boardDimensions,
-      };
-      allSnippets[state.currentFileDestination.id]?.snippets
-        ? localStorage.setItem(
-            "snippets",
-            JSON.stringify(
+        // let allSnippets = JSON.parse(localStorage.getItem("allSnippets"));
+        let allSnippets = await get("allSnippets"); //indexdb
+
+        allSnippets = allSnippets ? allSnippets : {};
+        allSnippets[prevFileDestination.id] = {
+          snippets: state.snippets,
+          boardDimensions: state.boardDimensions,
+        };
+        allSnippets[state.currentFileDestination.id]?.snippets
+          ? // localStorage.setItem(
+            //     "snippets",
+            //     JSON.stringify(
+            //       allSnippets[state.currentFileDestination.id].snippets
+            //     )
+            //   )
+            await set(
+              "snippets",
               allSnippets[state.currentFileDestination.id].snippets
-            )
-          )
-        : localStorage.removeItem("snippets");
+            ) //indexeddb
+          : // localStorage.removeItem("snippets")
+            await del("snippets"); //indexeddb
 
-      allSnippets[state.currentFileDestination.id]?.boardDimensions
-        ? localStorage.setItem(
-            "boardDimensions",
-            JSON.stringify(
+        allSnippets[state.currentFileDestination.id]?.boardDimensions
+          ? //  localStorage.setItem(
+            //     "boardDimensions",
+            //     JSON.stringify(
+            //       allSnippets[state.currentFileDestination.id].boardDimensions
+            //     )
+            //   )
+            await set(
+              "boardDimensions",
               allSnippets[state.currentFileDestination.id].boardDimensions
-            )
-          )
-        : localStorage.removeItem("boardDimensions");
+            ) //indexeddb
+          : // localStorage.removeItem("boardDimensions")
+            await del("boardDimensions"); //indexeddb
 
-      localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
-      window.location.reload();
-    }
+        // localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
+        await set("allSnippets", allSnippets);
+        window.location.reload();
+      }
+    };
+    handleFileDestChange();
   }, [state.currentFileDestination]);
 
   useEffect(() => {
     // Handles getting saved data and loading them into the state
-    let storedSnippets,
-      boardDimensions,
-      currentFileDestination,
-      folderAndFilesKeys;
-    storedSnippets = JSON.parse(localStorage.getItem("snippets"));
-    boardDimensions = JSON.parse(localStorage.getItem("boardDimensions"));
-    folderAndFilesKeys = JSON.parse(localStorage.getItem("folderAndFilesKeys"));
-    currentFileDestination = JSON.parse(
-      localStorage.getItem("currentFileDestination")
-    );
-
-    // if no stored values, then set some default values
-    if (!storedSnippets) {
-      storedSnippets = [];
-    }
-    if (!boardDimensions) {
-      boardDimensions = {
-        transform: "translate(0px, 0px)",
-        width: boardSize,
-        height: boardSize,
-        top: -boardSize / 2,
-        left: -boardSize / 2,
-      };
-    }
-    if (!folderAndFilesKeys && !currentFileDestination) {
-      const defaultFile = {
-        name: "default222",
-        id: Date.now(),
-        isFile: true,
-        subFoldersAndFiles: undefined,
-      };
-      folderAndFilesKeys = [defaultFile];
-      currentFileDestination = defaultFile;
-    }
-    // if (!currentFileDestination) {
-    //   currentFileDestination = "default";
-    // }
-    dispatch({
-      type: ACTIONS.LOAD_DATA_FROM_LS,
-      payload: {
-        storedSnippets,
+    const loadDataIntoState = async () => {
+      let storedSnippets,
         boardDimensions,
-        folderAndFilesKeys,
         currentFileDestination,
-      },
-    });
+        folderAndFilesKeys;
+      // storedSnippets = JSON.parse(localStorage.getItem("snippets"));
+      // boardDimensions = JSON.parse(localStorage.getItem("boardDimensions"));
+      // folderAndFilesKeys = JSON.parse(localStorage.getItem("folderAndFilesKeys"));
+      // currentFileDestination = JSON.parse(
+      //   localStorage.getItem("currentFileDestination")
+      // );
+      storedSnippets = await get("snippets");
+      boardDimensions = await get("boardDimensions");
+      folderAndFilesKeys = await get("folderAndFilesKeys");
+      currentFileDestination = await get("currentFileDestination");
+
+      // if no stored values, then set some default values
+      if (!storedSnippets) {
+        storedSnippets = [];
+      }
+      if (!boardDimensions) {
+        boardDimensions = {
+          transform: "translate(0px, 0px)",
+          width: boardSize,
+          height: boardSize,
+          top: -boardSize / 2,
+          left: -boardSize / 2,
+        };
+      }
+      if (!folderAndFilesKeys && !currentFileDestination) {
+        const defaultFile = {
+          name: "Default",
+          id: Date.now(),
+          isFile: true,
+          subFoldersAndFiles: undefined,
+        };
+        folderAndFilesKeys = [defaultFile];
+        currentFileDestination = defaultFile;
+      }
+      // if (!currentFileDestination) {
+      //   currentFileDestination = "default";
+      // }
+      dispatch({
+        type: ACTIONS.LOAD_DATA_FROM_LS,
+        payload: {
+          storedSnippets,
+          boardDimensions,
+          folderAndFilesKeys,
+          currentFileDestination,
+        },
+      });
+    };
+    loadDataIntoState();
   }, []);
 
   useEffect(() => {
     // update ls whenever new folder/file created or curren opened file changed
-    if (state.folderAndFilesKeys && state.currentFileDestination) {
-      localStorage.setItem(
-        "folderAndFilesKeys",
-        JSON.stringify(state.folderAndFilesKeys)
-      );
-      localStorage.setItem(
-        "currentFileDestination",
-        JSON.stringify(state.currentFileDestination)
-      );
-    }
+    const handleFileChange = async () => {
+      if (state.folderAndFilesKeys && state.currentFileDestination) {
+        // localStorage.setItem(
+        //   "folderAndFilesKeys",
+        //   JSON.stringify(state.folderAndFilesKeys)
+        // );
+        // localStorage.setItem(
+        //   "currentFileDestination",
+        //   JSON.stringify(state.currentFileDestination)
+        // );
+        // setMany([
+        //   ["folderAndFilesKeys", state.folderAndFilesKeys],
+        //   ["currentFileDestination", state.currentFileDestination],
+        // ]);
+        await set("folderAndFilesKeys", state.folderAndFilesKeys);
+        await set("currentFileDestination", state.currentFileDestination);
+      }
+    };
+    handleFileChange();
   }, [state.folderAndFilesKeys, state.currentFileDestination]);
 
   useEffect(() => {
@@ -424,8 +459,10 @@ export default function useBoardHook() {
 
   useEffect(() => {
     if (state.snippets) {
-      // save the snippet in local storage for persistence
-      localStorage.setItem("snippets", JSON.stringify(state.snippets));
+      // save the snippet in local storage (OLD) for persistence
+      // localStorage.setItem("snippets", JSON.stringify(state.snippets));
+      // save the snippet in indexedDB for persistence
+      set("snippets", state.snippets);
     }
   }, [state.snippets]);
 
@@ -433,10 +470,11 @@ export default function useBoardHook() {
     if (!state.boardDimensions) {
       return;
     }
-    localStorage.setItem(
-      "boardDimensions",
-      JSON.stringify(state.boardDimensions)
-    );
+    // localStorage.setItem(
+    //   "boardDimensions",
+    //   JSON.stringify(state.boardDimensions)
+    // );
+    set("boardDimensions", state.boardDimensions); //indexed db
   }, [state.boardDimensions]);
 
   useEffect(() => {
@@ -570,14 +608,22 @@ export default function useBoardHook() {
   };
 
   const deleteAFolderOrFile = (folderId) => {
-    const allSnippets = JSON.parse(localStorage.getItem("allSnippets"));
-    const arrOfIds = [];
-    getNestedFoldersNFilesIds(state.folderAndFilesKeys, folderId, arrOfIds);
-    arrOfIds.forEach((eachId) => {
-      if (allSnippets[eachId]) delete allSnippets[eachId];
+    // const allSnippets = JSON.parse(localStorage.getItem("allSnippets"));
+    get("allSnippets").then((allSnippets) => {
+      allSnippets = allSnippets || [];
+      const arrOfIds = [];
+      getNestedFoldersNFilesIds(state.folderAndFilesKeys, folderId, arrOfIds);
+      arrOfIds.forEach((eachId) => {
+        if (allSnippets[eachId]) delete allSnippets[eachId];
+      });
+      // localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
+      set("allSnippets", allSnippets).then(() => {
+        dispatch({
+          type: ACTIONS.DELETE_A_FOLDER_OR_FILE,
+          payload: { folderId },
+        });
+      });
     });
-    localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
-    dispatch({ type: ACTIONS.DELETE_A_FOLDER_OR_FILE, payload: { folderId } });
   };
 
   const editAFolderOrFileName = (folderId, name) => {

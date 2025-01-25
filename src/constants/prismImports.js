@@ -51,13 +51,3 @@ export const prismLanguagesSorted = sorted.map((eachKey) => ({
   prismKey: eachKey,
   name: prismLanguages[eachKey].name,
 }));
-
-export const loadPrismTheme = (isDarkMode) => {
-  // const theme = isDarkMode
-  //   ?  // Dark theme
-  //   : "prismjs/themes/prism-coy.css"; // Light theme
-
-  import("prismjs/themes/prism-tomorrow.css").then(() => {
-    console.log(`${theme} theme loaded!`);
-  });
-};    

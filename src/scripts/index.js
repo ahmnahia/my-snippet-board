@@ -59,8 +59,6 @@ export const editNestedFolderName = (arr, folderId, name) => {
 };
 
 export const deleteNestedFolder = (arr, folderId) => {
-  console.log("File/FOLDER ID deleted: ", folderId);
-
   return arr
     .filter((eachItem) => eachItem.id !== folderId) // Filter out the item with the matching ID
     .map((eachItem) => {
