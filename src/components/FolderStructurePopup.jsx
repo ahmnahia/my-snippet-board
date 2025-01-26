@@ -41,9 +41,14 @@ export default function FolderStructurePopup({
     editAFolderOrFileName,
     changeFileDestination,
   },
+  folderBtnRef,
+  handleExportOnClick,
+  isExport,
 }) {
   const [currentSelectedFileOrFolder, setCurrentSelectedFileOrFolder] =
     useState(undefined);
+  console.log(currentSelectedFileOrFolder);
+
   const [flattenedArray, setFlattenedArray] = useState([]);
   const [nameEdit, setNameEdit] = useState("");
 
@@ -52,6 +57,15 @@ export default function FolderStructurePopup({
     traverseNestedArray(folderAndFilesKeys, 0, temp);
     setFlattenedArray(temp);
   }, [folderAndFilesKeys]);
+
+  useEffect(() => {
+    if (isExport) setCurrentSelectedFileOrFolder([]);
+    else setCurrentSelectedFileOrFolder(undefined);
+  }, [isExport]);
+
+  const isItemSelected = () => {
+    return;
+  };
 
   const ContextMenuWrapper = ({
     children,
@@ -72,10 +86,12 @@ export default function FolderStructurePopup({
             {children}
           </Button>
         </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem onClick={handleEdit}>Edit</ContextMenuItem>
-          <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
-        </ContextMenuContent>
+        {isExport ? null : (
+          <ContextMenuContent>
+            <ContextMenuItem onClick={handleEdit}>Edit</ContextMenuItem>
+            <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
+          </ContextMenuContent>
+        )}
       </ContextMenu>
     );
   };
@@ -85,16 +101,27 @@ export default function FolderStructurePopup({
         e.stopPropagation();
       }}
     >
-      <Dialog>
+      <Dialog
+        onOpenChange={(val) => {
+          if (!val) {
+            handleExportOnClick();
+            setCurrentSelectedFileOrFolder(undefined);
+          }
+        }}
+      >
         <DialogTrigger asChild className="w-full">
-          <Button variant="outline" className="w-full capitalize">
+          <Button
+            variant="outline"
+            className="w-full capitalize"
+            ref={folderBtnRef}
+          >
             {currentFileDestination.name}
           </Button>
         </DialogTrigger>
         <DialogContent
-          className="sm:max-w-[425px] border "
+          className="sm:max-w-[425px] border"
           onClick={() => {
-            setCurrentSelectedFileOrFolder(undefined);
+            setCurrentSelectedFileOrFolder(isExport ? [] : undefined);
           }}
         >
           <DialogHeader>
@@ -111,6 +138,18 @@ export default function FolderStructurePopup({
                     key={idx}
                     handleClick={(e) => {
                       e.stopPropagation();
+                      let temp;
+                      if (isExport) {
+                        temp = currentSelectedFileOrFolder.filter(
+                          (ei) => ei.id == eachItem.id
+                        );
+                        temp =
+                          temp.length > 0
+                            ? temp
+                            : [...currentSelectedFileOrFolder, eachItem];
+                        setCurrentSelectedFileOrFolder(temp);
+                        return;
+                      }
                       setCurrentSelectedFileOrFolder(eachItem);
                     }}
                     handleDelete={() => {
@@ -125,12 +164,17 @@ export default function FolderStructurePopup({
                       setNameEdit(eachItem.name);
                     }}
                     buttonStyles={{
-                      backgroundColor:
-                        eachItem.id == currentSelectedFileOrFolder?.id
-                          ? currentSelectedFileOrFolder.isEdit
-                            ? "transparent"
-                            : "#a1a1aa"
-                          : null,
+                      backgroundColor: isExport
+                        ? currentSelectedFileOrFolder?.filter(
+                            (ei) => ei.id == eachItem.id
+                          ).length > 0
+                          ? "#a1a1aa"
+                          : null
+                        : eachItem.id == currentSelectedFileOrFolder?.id
+                        ? currentSelectedFileOrFolder.isEdit
+                          ? "transparent"
+                          : "#a1a1aa"
+                        : null,
                       marginLeft: 28 * eachItem.level,
                     }}
                   >

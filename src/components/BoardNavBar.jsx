@@ -1,6 +1,6 @@
 "use client";
-import { MdOutlineUndo , MdOutlineRedo} from "react-icons/md";
-import { CgExport, CgImport  } from "react-icons/cg";
+import { MdOutlineUndo, MdOutlineRedo } from "react-icons/md";
+import { CgExport, CgImport } from "react-icons/cg";
 import ThemeToggle from "./ThemeToggle";
 import FolderStructurePopup from "./FolderStructurePopup";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
+import useExportImportFolderPopup from "@/hooks/useExportImportFolderPopup";
 
 export default function BoardNavBar({
   currentFileDestination,
@@ -20,14 +21,17 @@ export default function BoardNavBar({
   undoStack,
   snippets,
 }) {
+  const { folderBtnRef, isExport, handleExportOnClick } = useExportImportFolderPopup();
 
   return (
     <div className="z-50 w-full flex justify-center fixed top-10">
       <div className="w-[700px] h-[50px] bg-transparent border border-zinc-400 rounded-xl flex justify-between items-center px-2">
         <div className="">
-
-          <AppSidebar snippets={snippets} updateBoardView={actions.updateBoardView}/>
-          <SidebarTrigger className="relative"/>
+          <AppSidebar
+            snippets={snippets}
+            updateBoardView={actions.updateBoardView}
+          />
+          <SidebarTrigger className="relative" />
         </div>
         <div className="flex gap-2">
           <TooltipProvider>
@@ -72,9 +76,13 @@ export default function BoardNavBar({
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className=" rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                  <CgExport 
+                  <CgExport
                     className="text-xl"
-                    style={{ }}
+                    style={{}}
+                    onClick={() => {
+                      folderBtnRef.current && folderBtnRef.current.click();
+                      handleExportOnClick();
+                    }}
                   />
                 </div>
               </TooltipTrigger>
@@ -87,10 +95,7 @@ export default function BoardNavBar({
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className=" rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                  <CgImport  
-                    className="text-xl"
-                    style={{ }}
-                  />
+                  <CgImport className="text-xl" style={{}} />
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -108,6 +113,9 @@ export default function BoardNavBar({
                     currentFileDestination={currentFileDestination}
                     folderAndFilesKeys={folderAndFilesKeys}
                     actions={actions}
+                    folderBtnRef={folderBtnRef}
+                    isExport={isExport}
+                    handleExportOnClick={handleExportOnClick}
                   />
                 </div>
               </TooltipTrigger>
