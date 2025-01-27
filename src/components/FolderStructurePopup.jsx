@@ -49,11 +49,12 @@ export default function FolderStructurePopup({
   folderBtnRef,
   handleExportOnClick,
   isExport,
+  isImport,
 }) {
   const [currentSelectedFileOrFolder, setCurrentSelectedFileOrFolder] =
     useState(undefined);
-  const [newFolderAndFilesKeys, setNewFolderAndFilesKeys] = useState([]);
-  console.log(folderAndFilesKeys);
+
+  const [newFolderAndFilesKeys, setNewFolderAndFilesKeys] = useState([]); //for export use case
 
   const [flattenedArray, setFlattenedArray] = useState([]);
   const [nameEdit, setNameEdit] = useState("");
@@ -143,7 +144,6 @@ export default function FolderStructurePopup({
           onClick={() => {
             setCurrentSelectedFileOrFolder(isExport ? [] : undefined);
             isExport && setNewFolderAndFilesKeys([]);
-      
           }}
         >
           <DialogHeader>
@@ -248,12 +248,9 @@ export default function FolderStructurePopup({
               <div className="flex justify-end w-full">
                 <div className="flex gap-2">
                   <Button
-                    disabled={currentSelectedFileOrFolder?.length == 0}
+                    disabled={newFolderAndFilesKeys?.length == 0}
                     onClick={() => {
-                      exportSelectedFiles(
-                        currentSelectedFileOrFolder,
-                        folderAndFilesKeys
-                      );
+                      exportSelectedFiles(newFolderAndFilesKeys);
                     }}
                   >
                     Export Selected Files
@@ -266,6 +263,20 @@ export default function FolderStructurePopup({
                     Export Everything
                   </Button>
                 </div>
+              </div>
+            ) : isImport ? (
+              <div className="flex justify-end w-full">
+                <Button
+                  disabled={currentSelectedFileOrFolder?.isFile}
+                  variant="outline"
+                  onClick={(e) => {}}
+                >
+                  {currentSelectedFileOrFolder?.id
+                    ? currentSelectedFileOrFolder.isFile
+                      ? "Can't Import Here"
+                      : "Import at " + currentSelectedFileOrFolder.name
+                    : "Import at Root"}
+                </Button>
               </div>
             ) : (
               <div className="flex justify-between w-full">
@@ -284,7 +295,7 @@ export default function FolderStructurePopup({
                 <div className="flex gap-2">
                   <Button
                     disabled={currentSelectedFileOrFolder?.isFile}
-                    onClick={(e) => {
+                    onClick={() => {
                       addANewFolderOrFile(
                         "New File",
                         true,

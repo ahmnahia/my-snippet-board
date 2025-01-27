@@ -1,4 +1,4 @@
-import { getMany } from "idb-keyval";
+import { get, getMany } from "idb-keyval";
 
 export const getTranslateXY = (translateString) => {
   return [
@@ -165,18 +165,9 @@ const traverseAndFilter = (
   });
 };
 
-export const exportSelectedFiles = (
-  folderAndFilesKeysSelected,
-  folderAndFilesKeys
-) => {
-  const newFolderAndFilesKeys = [];
-
-  traverseAndFilter(
-    folderAndFilesKeys,
-    [],
-    folderAndFilesKeysSelected.map((ei) => ei.id)
-  );
-  newFolderAndFilesKeys;
+export const exportSelectedFiles = async (folderAndFilesKeys) => {
+  const allSnippets = await get("allSnippets");
+  downloadJson({ allSnippets, folderAndFilesKeys });
 };
 
 export const exportEverything = async () => {
@@ -184,7 +175,11 @@ export const exportEverything = async () => {
     "allSnippets",
     "folderAndFilesKeys",
   ]);
-  const jsonData = JSON.stringify({ allSnippets, folderAndFilesKeys }, null, 2);
+  downloadJson({ allSnippets, folderAndFilesKeys });
+};
+
+const downloadJson = (data) => {
+  const jsonData = JSON.stringify(data, null, 2);
   const blob = new Blob([jsonData], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
@@ -198,7 +193,6 @@ export const exportEverything = async () => {
   // clean up
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-  console.log(allSnippets, folderAndFilesKeys);
 };
 
 export function updateSelectedItems(array, selectedId, selectedItems = []) {

@@ -21,7 +21,13 @@ export default function BoardNavBar({
   undoStack,
   snippets,
 }) {
-  const { folderBtnRef, isExport, handleExportOnClick } = useExportImportFolderPopup();
+  const {
+    folderBtnRef,
+    isExport,
+    isImport,
+    handleExportOnClick,
+    toggleImportState,
+  } = useExportImportFolderPopup();
 
   return (
     <div className="z-50 w-full flex justify-center fixed top-10">
@@ -95,7 +101,14 @@ export default function BoardNavBar({
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className=" rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                  <CgImport className="text-xl" style={{}} />
+                  <CgImport
+                    className="text-xl"
+                    style={{}}
+                    onClick={() => {
+                      folderBtnRef.current && folderBtnRef.current.click();
+                      toggleImportState();
+                    }}
+                  />
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -116,6 +129,8 @@ export default function BoardNavBar({
                     folderBtnRef={folderBtnRef}
                     isExport={isExport}
                     handleExportOnClick={handleExportOnClick}
+                    toggleImportState={toggleImportState}
+                    isImport={isImport}
                   />
                 </div>
               </TooltipTrigger>
