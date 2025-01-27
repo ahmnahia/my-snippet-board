@@ -1,3 +1,5 @@
+import { getMany } from "idb-keyval";
+
 export const getTranslateXY = (translateString) => {
   return [
     Number(translateString.split("(")[1].split(",")[0].replace("px", "")),
@@ -75,7 +77,11 @@ export const deleteNestedFolder = (arr, folderId) => {
     });
 };
 
-export const getNestedFoldersNFilesIds = (folderAndFilesKeys, targetId, arrOfIds) => {
+export const getNestedFoldersNFilesIds = (
+  folderAndFilesKeys,
+  targetId,
+  arrOfIds
+) => {
   folderAndFilesKeys.forEach((eachItem) => {
     // If we find the target ID
     if (eachItem.id === targetId) {
@@ -101,7 +107,7 @@ export const getNestedFoldersNFilesIds = (folderAndFilesKeys, targetId, arrOfIds
 // Helper function to collect all child IDs of a folder
 const getAllChildIds = (folderContents, arrOfIds) => {
   folderContents.forEach((item) => {
-    arrOfIds.push(item.id); 
+    arrOfIds.push(item.id);
     if (!item.isFile && item.subFoldersAndFiles) {
       getAllChildIds(item.subFoldersAndFiles, arrOfIds); // Recursively add child IDs
     }
@@ -139,3 +145,126 @@ export const redo = (currentAction, undoStack, redoStack) => {
     return { undoStack, redoStack, newAction };
   }
 };
+
+const traverseAndFilter = (
+  arr,
+  folderAndFilesKeysSelected,
+  newFolderAndFilesKeys
+) => {
+  arr.forEach((eachItem) => {
+    if (folderAndFilesKeysSelected.find((ei) => ei == eachItem.id)) {
+      newFolderAndFilesKeys.push({ ...eachItem, level });
+    }
+    if (eachItem.subFoldersAndFiles) {
+      traverseNestedArray(
+        eachItem.subFoldersAndFiles,
+        level + 1,
+        flattenedArray
+      );
+    }
+  });
+};
+
+export const exportSelectedFiles = (
+  folderAndFilesKeysSelected,
+  folderAndFilesKeys
+) => {
+  const newFolderAndFilesKeys = [];
+
+  traverseAndFilter(
+    folderAndFilesKeys,
+    [],
+    folderAndFilesKeysSelected.map((ei) => ei.id)
+  );
+  newFolderAndFilesKeys;
+};
+
+export const exportEverything = async () => {
+  const [allSnippets, folderAndFilesKeys] = await getMany([
+    "allSnippets",
+    "folderAndFilesKeys",
+  ]);
+  const jsonData = JSON.stringify({ allSnippets, folderAndFilesKeys }, null, 2);
+  const blob = new Blob([jsonData], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  // create a link element and trigger the download
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "MySnippetBoardData.json";
+  document.body.appendChild(link);
+  link.click();
+
+  // clean up
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  console.log(allSnippets, folderAndFilesKeys);
+};
+
+export function updateSelectedItems(array, selectedId, selectedItems = []) {
+  // function to find an item and all its parents
+  function findItemAndParents(itemArray, targetId, parents = []) {
+    for (const item of itemArray) {
+      if (item.id === targetId) {
+        return { item, parents };
+      }
+      if (!item.isFile && item.subFoldersAndFiles) {
+        const result = findItemAndParents(item.subFoldersAndFiles, targetId, [
+          ...parents,
+          item,
+        ]);
+        if (result) return result;
+      }
+    }
+    return null;
+  }
+
+  // function to remove an item and its empty parents
+  function removeItemAndEmptyParents(itemArray, targetId) {
+    return itemArray.filter((item) => {
+      if (item.id === targetId) return false;
+      if (!item.isFile && item.subFoldersAndFiles) {
+        item.subFoldersAndFiles = removeItemAndEmptyParents(
+          item.subFoldersAndFiles,
+          targetId
+        );
+        return item.subFoldersAndFiles.length > 0;
+      }
+      return true;
+    });
+  }
+
+  // Clone to avoid mutation
+  let updatedItems = JSON.parse(JSON.stringify(selectedItems));
+
+  const found = findItemAndParents(array, selectedId);
+
+  if (found) {
+    const { item, parents } = found;
+    const parentPath = parents.reduce((acc, parent) => {
+      const existingParent = acc.find((p) => p.id === parent.id);
+      if (!existingParent) {
+        const newParent = { ...parent, subFoldersAndFiles: [] };
+        acc.push(newParent);
+        return newParent.subFoldersAndFiles;
+      }
+      return existingParent.subFoldersAndFiles;
+    }, updatedItems);
+
+    const alreadySelected = findItemAndParents(updatedItems, selectedId);
+
+    if (alreadySelected) {
+      // if already selected, remove it and clean up empty parents
+      updatedItems = removeItemAndEmptyParents(updatedItems, selectedId);
+    } else {
+      // If not selected, add the item and all its parents
+      if (item.isFile) {
+        parentPath.push({ ...item });
+      } else {
+        parentPath.push(JSON.parse(JSON.stringify(item)));
+      }
+    }
+  }
+
+  return updatedItems;
+}
