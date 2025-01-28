@@ -23,19 +23,7 @@ import {
   exportSelectedFiles,
   updateSelectedItems,
 } from "@/scripts";
-
-const traverseNestedArray = (arr, level, flattenedArray) => {
-  arr.forEach((eachItem) => {
-    flattenedArray.push({ ...eachItem, level });
-    if (eachItem.subFoldersAndFiles) {
-      traverseNestedArray(
-        eachItem.subFoldersAndFiles,
-        level + 1,
-        flattenedArray
-      );
-    }
-  });
-};
+import { traverseNestedArray } from "@/scripts";
 
 export default function FolderStructurePopup({
   currentFileDestination,
@@ -48,6 +36,7 @@ export default function FolderStructurePopup({
   },
   folderBtnRef,
   handleExportOnClick,
+  toggleImportState,
   isExport,
   isImport,
 }) {
@@ -71,21 +60,6 @@ export default function FolderStructurePopup({
       setNewFolderAndFilesKeys([]);
     } else setCurrentSelectedFileOrFolder(undefined);
   }, [isExport]);
-
-  const isItemSelected = (
-    folderAndFilesKeys,
-    targetId,
-    newCurrentSelectedFileOrFolder
-  ) => {
-    folderAndFilesKeys.map((eachF) => {
-      if (eachF.isFile && eachF.id == targetId) {
-        newCurrentSelectedFileOrFolder.push(eachF);
-      } else if (!eachF.isFile && eachF.id == targetId) {
-        newCurrentSelectedFileOrFolder.push(eachF);
-      } else if (!eachF.isFile) {
-      }
-    });
-  };
 
   const ContextMenuWrapper = ({
     children,
@@ -127,6 +101,8 @@ export default function FolderStructurePopup({
             handleExportOnClick();
             setCurrentSelectedFileOrFolder(undefined);
             setNewFolderAndFilesKeys([]);
+          } else if (!val && isImport) {
+            toggleImportState();
           }
         }}
       >
@@ -160,7 +136,6 @@ export default function FolderStructurePopup({
                     key={idx}
                     handleClick={(e) => {
                       e.stopPropagation();
-                      let temp;
                       if (isExport) {
                         // temp = currentSelectedFileOrFolder.filter(
                         //   (ei) => ei.id == eachItem.id

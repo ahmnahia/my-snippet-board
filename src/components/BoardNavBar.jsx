@@ -23,6 +23,7 @@ export default function BoardNavBar({
 }) {
   const {
     folderBtnRef,
+    fileInputImportRef,
     isExport,
     isImport,
     handleExportOnClick,
@@ -105,6 +106,18 @@ export default function BoardNavBar({
                     className="text-xl"
                     style={{}}
                     onClick={() => {
+                      fileInputImportRef.current.click();
+                      // folderBtnRef.current && folderBtnRef.current.click();
+                      // toggleImportState();
+                    }}
+                  />
+                  <input
+                    type="file"
+                    accept=".json"
+                    hidden
+                    ref={fileInputImportRef}
+                    onChange={() => {
+                      console.log("file imported");
                       folderBtnRef.current && folderBtnRef.current.click();
                       toggleImportState();
                     }}

@@ -217,7 +217,7 @@ const reducer = (state, action) => {
         action.payload.folderId,
         {
           name: action.payload.name,
-          id: Date.now(),
+          id: Date.now() + Math.random(),
           isFile: action.payload.isFile,
           subFoldersAndFiles: action.payload.isFile ? undefined : [],
         }
@@ -397,7 +397,7 @@ export default function useBoardHook() {
       if (!folderAndFilesKeys && !currentFileDestination) {
         const defaultFile = {
           name: "Default",
-          id: Date.now(),
+          id: Date.now() + Math.random(),
           isFile: true,
           subFoldersAndFiles: undefined,
         };

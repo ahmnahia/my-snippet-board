@@ -7,6 +7,19 @@ export const getTranslateXY = (translateString) => {
   ];
 };
 
+export const traverseNestedArray = (arr, level, flattenedArray) => {
+  arr.forEach((eachItem) => {
+    flattenedArray.push({ ...eachItem, level });
+    if (eachItem.subFoldersAndFiles) {
+      traverseNestedArray(
+        eachItem.subFoldersAndFiles,
+        level + 1,
+        flattenedArray
+      );
+    }
+  });
+};
+
 export const addNestedFolder = (arr, folderId, folderObj) => {
   if (folderId) {
     return arr.map((eachItem) => {
@@ -146,25 +159,6 @@ export const redo = (currentAction, undoStack, redoStack) => {
   }
 };
 
-const traverseAndFilter = (
-  arr,
-  folderAndFilesKeysSelected,
-  newFolderAndFilesKeys
-) => {
-  arr.forEach((eachItem) => {
-    if (folderAndFilesKeysSelected.find((ei) => ei == eachItem.id)) {
-      newFolderAndFilesKeys.push({ ...eachItem, level });
-    }
-    if (eachItem.subFoldersAndFiles) {
-      traverseNestedArray(
-        eachItem.subFoldersAndFiles,
-        level + 1,
-        flattenedArray
-      );
-    }
-  });
-};
-
 export const exportSelectedFiles = async (folderAndFilesKeys) => {
   const allSnippets = await get("allSnippets");
   downloadJson({ allSnippets, folderAndFilesKeys });
@@ -178,7 +172,37 @@ export const exportEverything = async () => {
   downloadJson({ allSnippets, folderAndFilesKeys });
 };
 
+export function assignNewIds(folderAndFilesKeys) {
+  function traverseAndAssign(items) {
+    return items.map((item) => {
+      const newItem = {
+        ...item,
+        oldId: item.id, // keeping the old ID
+        id: Date.now() + Math.random(),
+      };
+
+      if (!item.isFile && item.subFoldersAndFiles) {
+        newItem.subFoldersAndFiles = traverseAndAssign(item.subFoldersAndFiles);
+      }
+
+      return newItem;
+    });
+  }
+
+  return traverseAndAssign(folderAndFilesKeys);
+}
+
 const downloadJson = (data) => {
+  const folderAndFilesKeysWithNewIds = assignNewIds(data.folderAndFilesKeys);
+  const flattenedArray = [];
+  traverseNestedArray(folderAndFilesKeysWithNewIds, 0, flattenedArray);
+
+  flattenedArray.forEach((ei) => {
+    if (data.allSnippets[ei.oldId]) {
+      data.allSnippets[ei.id] = data.allSnippets[ei.oldId];
+      delete data.allSnippets[ei.oldId];
+    }
+  });
   const jsonData = JSON.stringify(data, null, 2);
   const blob = new Blob([jsonData], { type: "application/json" });
   const url = URL.createObjectURL(blob);
