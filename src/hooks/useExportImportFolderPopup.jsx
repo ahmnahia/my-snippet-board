@@ -1,5 +1,6 @@
 "use client";
 
+import { addToFolder } from "@/scripts";
 import { useRef, useState } from "react";
 
 export default function useExportImportFolderPopup() {
@@ -17,8 +18,14 @@ export default function useExportImportFolderPopup() {
     setIsImport(!isImport);
   };
 
-  const handleDataToImport = () => {
-    
+  const handleDataToImport = (importedData) => {
+    setDataToImport(importedData);
+  };
+
+  const handleFolderImportDestination = (folderId, folderAndFilesKeys) => {
+    console.log("before, ", folderAndFilesKeys);
+    addToFolder(folderAndFilesKeys, folderId, dataToImport.folderAndFilesKeys);
+    console.log("after, ", folderAndFilesKeys);
   };
 
   return {
@@ -28,5 +35,7 @@ export default function useExportImportFolderPopup() {
     isImport,
     handleExportOnClick,
     toggleImportState,
+    handleDataToImport,
+    handleFolderImportDestination
   };
 }

@@ -28,6 +28,8 @@ export default function BoardNavBar({
     isImport,
     handleExportOnClick,
     toggleImportState,
+    handleDataToImport,
+    handleFolderImportDestination
   } = useExportImportFolderPopup();
 
   return (
@@ -107,8 +109,6 @@ export default function BoardNavBar({
                     style={{}}
                     onClick={() => {
                       fileInputImportRef.current.click();
-                      // folderBtnRef.current && folderBtnRef.current.click();
-                      // toggleImportState();
                     }}
                   />
                   <input
@@ -116,10 +116,20 @@ export default function BoardNavBar({
                     accept=".json"
                     hidden
                     ref={fileInputImportRef}
-                    onChange={() => {
-                      console.log("file imported");
-                      folderBtnRef.current && folderBtnRef.current.click();
-                      toggleImportState();
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        console.log("file imported");
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                          const data = JSON.parse(e.target.result);
+                          console.log(data);
+                          handleDataToImport(data);
+                        };
+                        reader.readAsText(file); // needed to trigger onload above
+                        folderBtnRef.current && folderBtnRef.current.click(); // open folder structure to select destination
+                        toggleImportState();
+                      }
                     }}
                   />
                 </div>
@@ -144,6 +154,7 @@ export default function BoardNavBar({
                     handleExportOnClick={handleExportOnClick}
                     toggleImportState={toggleImportState}
                     isImport={isImport}
+                    handleFolderImportDestination={handleFolderImportDestination}
                   />
                 </div>
               </TooltipTrigger>

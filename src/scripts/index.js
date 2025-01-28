@@ -286,3 +286,23 @@ export function updateSelectedItems(array, selectedId, selectedItems = []) {
 
   return updatedItems;
 }
+
+export const addToFolder = (structure, folderId, newFolderAndFilesKeys) => {
+  function findAndAddToFolder(items) {
+    for (const item of items) {
+      if (!item.isFile && item.id === folderId) {
+        // add newFolderAndFilesKeys to it subFoldersAndFiles
+        if (!item.subFoldersAndFiles) item.subFoldersAndFiles = [];
+        item.subFoldersAndFiles.push(...newFolderAndFilesKeys);
+        return true; // return true to stop further traversal
+      }
+      if (!item.isFile && item.subFoldersAndFiles) {
+        const found = findAndAddToFolder(item.subFoldersAndFiles);
+        if (found) return true; // stop recursion if the folder is found
+      }
+    }
+    return false; // return false if the folder is not found
+  }
+
+  return findAndAddToFolder(structure);
+};

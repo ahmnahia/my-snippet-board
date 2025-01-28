@@ -39,6 +39,7 @@ export default function FolderStructurePopup({
   toggleImportState,
   isExport,
   isImport,
+  handleFolderImportDestination,
 }) {
   const [currentSelectedFileOrFolder, setCurrentSelectedFileOrFolder] =
     useState(undefined);
@@ -137,23 +138,12 @@ export default function FolderStructurePopup({
                     handleClick={(e) => {
                       e.stopPropagation();
                       if (isExport) {
-                        // temp = currentSelectedFileOrFolder.filter(
-                        //   (ei) => ei.id == eachItem.id
-                        // );
-                        // temp =
-                        //   temp.length > 0
-                        //     ? currentSelectedFileOrFolder.filter(
-                        //         (ei) => ei.id != eachItem.id
-                        //       )
-                        //     : [...currentSelectedFileOrFolder, eachItem];
-                        // setCurrentSelectedFileOrFolder(temp);
                         const temp = updateSelectedItems(
                           folderAndFilesKeys,
                           eachItem.id,
                           newFolderAndFilesKeys
                         );
                         setNewFolderAndFilesKeys(temp);
-                        console.log("test chatgpt function: ", temp);
                         // fla
                         let temp2 = [];
                         traverseNestedArray(temp, 0, temp2);
@@ -244,7 +234,14 @@ export default function FolderStructurePopup({
                 <Button
                   disabled={currentSelectedFileOrFolder?.isFile}
                   variant="outline"
-                  onClick={(e) => {}}
+                  onClick={(e) => {
+                    console.log(currentSelectedFileOrFolder);
+                    
+                    handleFolderImportDestination(
+                      currentSelectedFileOrFolder.id,
+                      folderAndFilesKeys
+                    );
+                  }}
                 >
                   {currentSelectedFileOrFolder?.id
                     ? currentSelectedFileOrFolder.isFile
