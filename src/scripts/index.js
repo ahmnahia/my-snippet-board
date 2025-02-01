@@ -161,7 +161,7 @@ export const redo = (currentAction, undoStack, redoStack) => {
 
 export const exportSelectedFiles = async (folderAndFilesKeys) => {
   const allSnippets = await get("allSnippets");
-  downloadJson({ allSnippets, folderAndFilesKeys });
+  downloadJson({ allSnippets, folderAndFilesKeys }, true);
 };
 
 export const exportEverything = async () => {
@@ -169,6 +169,7 @@ export const exportEverything = async () => {
     "allSnippets",
     "folderAndFilesKeys",
   ]);
+
   downloadJson({ allSnippets, folderAndFilesKeys });
 };
 
@@ -192,18 +193,45 @@ export function assignNewIds(folderAndFilesKeys) {
   return traverseAndAssign(folderAndFilesKeys);
 }
 
-const downloadJson = (data) => {
+const downloadJson = async (data, isSelectedFilesOnly = false) => {
   const folderAndFilesKeysWithNewIds = assignNewIds(data.folderAndFilesKeys);
   const flattenedArray = [];
   traverseNestedArray(folderAndFilesKeysWithNewIds, 0, flattenedArray);
 
+  data.allSnippets = data.allSnippets || {};
+  const allSnippetsKeys = Object.keys(data.allSnippets);
+  if (isSelectedFilesOnly) {
+    // filter out the unwanted snippets
+    allSnippetsKeys.forEach((ek) => {
+      const isFound = flattenedArray.find((ei) => ei.oldId == ek);
+      if (!isFound) delete data.allSnippets[ek];
+    });
+  }
+
+  const currentFileDestination = await get("currentFileDestination");
+  const snippets = await get("snippets");
+
   flattenedArray.forEach((ei) => {
-    if (data.allSnippets[ei.oldId]) {
+    if (currentFileDestination?.id == ei.oldId) {
+      //if the file to export is the current file opened add/update to allSnippets
+      data.allSnippets[ei.id] = snippets;
+      delete data.allSnippets[ei.oldId];
+      return;
+    }
+
+    if (data.allSnippets && data.allSnippets[ei.oldId]) {
       data.allSnippets[ei.id] = data.allSnippets[ei.oldId];
       delete data.allSnippets[ei.oldId];
     }
   });
-  const jsonData = JSON.stringify(data, null, 2);
+  const jsonData = JSON.stringify(
+    {
+      allSnippets: data.allSnippets,
+      folderAndFilesKeys: folderAndFilesKeysWithNewIds,
+    },
+    null,
+    2
+  );
   const blob = new Blob([jsonData], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 

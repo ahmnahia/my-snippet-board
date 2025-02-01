@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { RiDragMove2Fill, RiFileCopyFill } from "react-icons/ri";
+import { MdDone } from "react-icons/md";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +33,7 @@ export default function Snippet({
 
   const [isHovered, setIsHovered] = useState(false);
   const [titleToEdit, setTitleToEdit] = useState({ id: undefined, string: "" });
+  const [isCopied, setIsCopied] = useState(false);
   const isListenerSet = useRef(false);
   const { theme } = useTheme();
   const isThemeSet = useRef(false);
@@ -73,6 +75,16 @@ export default function Snippet({
         isThemeSet.current = "light";
       });
   }, [theme]);
+
+  useEffect(() => {
+    if (isCopied) {
+      const timer = setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isCopied]);
 
   return (
     <div
@@ -163,16 +175,21 @@ export default function Snippet({
             </DropdownMenu>
           </div>
           <div className="text-2xl cursor-pointer">
-            <RiFileCopyFill
-              onClick={() => {
-                navigator.clipboard
-                  .writeText(content)
-                  .then(() => {})
-                  .catch((e) => {
-                    console.error("Error copying the snippet");
-                  });
-              }}
-            />
+            {isCopied ? (
+              <MdDone />
+            ) : (
+              <RiFileCopyFill
+                onClick={() => {
+                  navigator.clipboard
+                    .writeText(content)
+                    .then(() => {})
+                    .catch((e) => {
+                      console.error("Error copying the snippet");
+                    });
+                  setIsCopied(true);
+                }}
+              />
+            )}
           </div>
           <div className="cursor-move text-2xl " id={id + "header"}>
             <RiDragMove2Fill />

@@ -20,6 +20,7 @@ export default function BoardNavBar({
   redoStack,
   undoStack,
   snippets,
+  dispatch,
 }) {
   const {
     folderBtnRef,
@@ -29,8 +30,8 @@ export default function BoardNavBar({
     handleExportOnClick,
     toggleImportState,
     handleDataToImport,
-    handleFolderImportDestination
-  } = useExportImportFolderPopup();
+    handleFolderImportDestination,
+  } = useExportImportFolderPopup(dispatch);
 
   return (
     <div className="z-50 w-full flex justify-center fixed top-10">
@@ -119,17 +120,16 @@ export default function BoardNavBar({
                     onChange={(e) => {
                       const file = e.target.files[0];
                       if (file) {
-                        console.log("file imported");
                         const reader = new FileReader();
                         reader.onload = (e) => {
                           const data = JSON.parse(e.target.result);
-                          console.log(data);
                           handleDataToImport(data);
                         };
                         reader.readAsText(file); // needed to trigger onload above
                         folderBtnRef.current && folderBtnRef.current.click(); // open folder structure to select destination
-                        toggleImportState();
+                        toggleImportState(true);
                       }
+                      e.target.value = "";
                     }}
                   />
                 </div>
@@ -154,7 +154,9 @@ export default function BoardNavBar({
                     handleExportOnClick={handleExportOnClick}
                     toggleImportState={toggleImportState}
                     isImport={isImport}
-                    handleFolderImportDestination={handleFolderImportDestination}
+                    handleFolderImportDestination={
+                      handleFolderImportDestination
+                    }
                   />
                 </div>
               </TooltipTrigger>

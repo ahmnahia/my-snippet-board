@@ -2,8 +2,10 @@
 
 import { addToFolder } from "@/scripts";
 import { useRef, useState } from "react";
+import { ACTIONS } from "./useBoardHook";
+import { get, set } from "idb-keyval";
 
-export default function useExportImportFolderPopup() {
+export default function useExportImportFolderPopup(dispatch) {
   const folderBtnRef = useRef();
   const fileInputImportRef = useRef();
   const [isExport, setIsExport] = useState(false);
@@ -14,8 +16,8 @@ export default function useExportImportFolderPopup() {
     setIsExport(!isExport);
   };
 
-  const toggleImportState = () => {
-    setIsImport(!isImport);
+  const toggleImportState = (bol) => {
+    bol ? setIsImport(bol) : setIsImport(!isImport);
   };
 
   const handleDataToImport = (importedData) => {
@@ -23,9 +25,34 @@ export default function useExportImportFolderPopup() {
   };
 
   const handleFolderImportDestination = (folderId, folderAndFilesKeys) => {
-    console.log("before, ", folderAndFilesKeys);
-    addToFolder(folderAndFilesKeys, folderId, dataToImport.folderAndFilesKeys);
-    console.log("after, ", folderAndFilesKeys);
+    get("allSnippets").then((val) => {
+      if (!folderId) {
+        //import to root
+        dispatch({
+          type: ACTIONS.IMPORT_JSON_FILE,
+          payload: {
+            folderAndFilesKeys: [
+              ...folderAndFilesKeys,
+              ...dataToImport.folderAndFilesKeys,
+            ],
+          },
+        });
+        return;
+      }
+      addToFolder(
+        folderAndFilesKeys,
+        folderId,
+        dataToImport.folderAndFilesKeys
+      );
+      dispatch({
+        type: ACTIONS.IMPORT_JSON_FILE,
+        payload: { folderAndFilesKeys,  },
+      });
+      const allSnippets = { ...val, ...dataToImport.allSnippets };
+      set("allSnippets", allSnippets).then(() => {
+        console.log("allsnippets saved", allSnippets);
+      });
+    });
   };
 
   return {
@@ -36,6 +63,6 @@ export default function useExportImportFolderPopup() {
     handleExportOnClick,
     toggleImportState,
     handleDataToImport,
-    handleFolderImportDestination
+    handleFolderImportDestination,
   };
 }

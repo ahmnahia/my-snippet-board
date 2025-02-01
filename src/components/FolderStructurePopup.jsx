@@ -100,11 +100,11 @@ export default function FolderStructurePopup({
         onOpenChange={(val) => {
           if (!val && isExport) {
             handleExportOnClick();
-            setCurrentSelectedFileOrFolder(undefined);
             setNewFolderAndFilesKeys([]);
           } else if (!val && isImport) {
-            toggleImportState();
+            toggleImportState(false);
           }
+          setCurrentSelectedFileOrFolder(undefined);
         }}
       >
         <DialogTrigger asChild className="w-full">
@@ -130,7 +130,7 @@ export default function FolderStructurePopup({
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="gap-4 border border-zinc-400 dark:border-zinc-100 rounded-lg p-2 flex flex-col h-[300px] overflow-auto">
+            <div className="gap-4 border border-zinc-400 dark:border-zinc-100 rounded-lg p-2 flex flex-col h-[400px] overflow-auto">
               {flattenedArray.map((eachItem, idx) => {
                 return (
                   <ContextMenuWrapper
@@ -171,7 +171,7 @@ export default function FolderStructurePopup({
                           ? "#a1a1aa"
                           : null
                         : eachItem.id == currentSelectedFileOrFolder?.id
-                        ? currentSelectedFileOrFolder.isEdit
+                        ? currentSelectedFileOrFolder?.isEdit
                           ? "transparent"
                           : "#a1a1aa"
                         : null,
@@ -235,10 +235,8 @@ export default function FolderStructurePopup({
                   disabled={currentSelectedFileOrFolder?.isFile}
                   variant="outline"
                   onClick={(e) => {
-                    console.log(currentSelectedFileOrFolder);
-                    
                     handleFolderImportDestination(
-                      currentSelectedFileOrFolder.id,
+                      currentSelectedFileOrFolder?.id,
                       folderAndFilesKeys
                     );
                   }}

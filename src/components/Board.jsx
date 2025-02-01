@@ -44,6 +44,7 @@ export default function Board() {
         undoStack={undoStack}
         redoStack={redoStack}
         snippets={snippets}
+        dispatch={dispatch}
       />
       <div
         className={`z-0 absolute board-bg hover:cursor-grab dark:board-bg-dark`}

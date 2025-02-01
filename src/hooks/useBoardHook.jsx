@@ -11,7 +11,7 @@ import {
 } from "@/scripts";
 import { set, get, del, setMany } from "idb-keyval";
 
-const ACTIONS = {
+export const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
   ADD_A_NEW_SNIPPET: "ADD_A_NEW_SNIPPET",
   CHANGE_MOUSE_POSITION_VALUE: "CHANGE_MOUSE_POSITION_VALUE",
@@ -26,6 +26,7 @@ const ACTIONS = {
   EDIT_A_FOLDER_OR_FILE_NAME: "EDIT_A_FOLDER_OR_FILE_NAME",
   CHANGE_FILE_DESTINATION: "CHANGE_FILE_DESTINATION",
   UPDATE_SNIPPET_TITLE: "UPDATE_SNIPPET_TITLE",
+  IMPORT_JSON_FILE: "IMPORT_JSON_FILE",
 };
 
 const reducer = (state, action) => {
@@ -281,6 +282,15 @@ const reducer = (state, action) => {
           ? action.payload.redoStack
           : [],
       };
+
+    case ACTIONS.IMPORT_JSON_FILE:
+      return {
+        ...state,
+        folderAndFilesKeys: JSON.parse(
+          JSON.stringify(action.payload.folderAndFilesKeys) // needed to trigger useEffect, cuz of deep nested objects
+        ),
+      };
+
     default:
       return state;
   }
@@ -301,6 +311,7 @@ export default function useBoardHook() {
     undoStack: [],
     redoStack: [],
   });
+
 
   useEffect(() => {
     // Dealing with local storage when a file destination is changed
