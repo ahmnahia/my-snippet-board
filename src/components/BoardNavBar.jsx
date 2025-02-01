@@ -1,5 +1,5 @@
 "use client";
-import { MdOutlineUndo, MdOutlineRedo } from "react-icons/md";
+import { MdOutlineUndo, MdOutlineRedo, MdHelpOutline } from "react-icons/md";
 import { CgExport, CgImport } from "react-icons/cg";
 import ThemeToggle from "./ThemeToggle";
 import FolderStructurePopup from "./FolderStructurePopup";
@@ -12,6 +12,7 @@ import {
 import { SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import useExportImportFolderPopup from "@/hooks/useExportImportFolderPopup";
+import { HelpCircle } from "lucide-react";
 
 export default function BoardNavBar({
   currentFileDestination,
@@ -141,6 +142,7 @@ export default function BoardNavBar({
           </TooltipProvider>
         </div>
         <div className="flex gap-3 items-center">
+            <HelpCircle />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -165,7 +167,7 @@ export default function BoardNavBar({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <div className="border border-zinc-200 rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 p-1">
+          <div className="rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 p-1">
             <ThemeToggle />
           </div>
         </div>

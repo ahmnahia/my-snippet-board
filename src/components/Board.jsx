@@ -4,6 +4,7 @@ import SnippetBox from "./SnippetBox";
 import useBoardHook from "@/hooks/useBoardHook";
 import BoardNavBar from "./BoardNavBar";
 import useUndoRedoHook from "@/hooks/useUndoRedoHook";
+import EmptyFileGreeting from "./EmptyFileGreeting";
 
 export default function Board() {
   const {
@@ -46,6 +47,7 @@ export default function Board() {
         snippets={snippets}
         dispatch={dispatch}
       />
+
       <div
         className={`z-0 absolute board-bg hover:cursor-grab dark:board-bg-dark`}
         style={{
@@ -58,7 +60,7 @@ export default function Board() {
         }}
         id="board"
       >
-        {/* <SnippetBox /> */}
+        {snippets.length == 0 && <EmptyFileGreeting />}
         {snippets.map((eachSnippet, idx) => (
           <SnippetBox
             key={eachSnippet.id + idx}

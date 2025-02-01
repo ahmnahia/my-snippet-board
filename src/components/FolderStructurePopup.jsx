@@ -68,6 +68,7 @@ export default function FolderStructurePopup({
     handleEdit,
     handleDelete,
     buttonStyles,
+    idx,
   }) => {
     return (
       <ContextMenu>
@@ -81,7 +82,7 @@ export default function FolderStructurePopup({
             {children}
           </Button>
         </ContextMenuTrigger>
-        {isExport ? null : (
+        {isExport || isImport || idx == 0 ? null : ( // idx == 0 is for the default file
           <ContextMenuContent>
             <ContextMenuItem onClick={handleEdit}>Edit</ContextMenuItem>
             <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
@@ -110,7 +111,7 @@ export default function FolderStructurePopup({
         <DialogTrigger asChild className="w-full">
           <Button
             variant="outline"
-            className="w-full capitalize"
+            className="w-full capitalize select-none"
             ref={folderBtnRef}
           >
             {currentFileDestination.name}
@@ -135,6 +136,7 @@ export default function FolderStructurePopup({
                 return (
                   <ContextMenuWrapper
                     key={idx}
+                    idx={idx}
                     handleClick={(e) => {
                       e.stopPropagation();
                       if (isExport) {

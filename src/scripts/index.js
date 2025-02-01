@@ -96,17 +96,16 @@ export const getNestedFoldersNFilesIds = (
   arrOfIds
 ) => {
   folderAndFilesKeys.forEach((eachItem) => {
-    // If we find the target ID
     if (eachItem.id === targetId) {
       arrOfIds.push(eachItem.id);
 
-      // If it's a folder, collect all its children recursively
+      // if a folder, collect all its children recursively
       if (!eachItem.isFile && eachItem.subFoldersAndFiles) {
         getAllChildIds(eachItem.subFoldersAndFiles, arrOfIds);
       }
     }
 
-    // Continue traversing into folders if not the target ID
+    // continue traversing into folders if not the target ID
     if (!eachItem.isFile && eachItem.subFoldersAndFiles) {
       getNestedFoldersNFilesIds(
         eachItem.subFoldersAndFiles,
@@ -280,7 +279,7 @@ export function updateSelectedItems(array, selectedId, selectedItems = []) {
     });
   }
 
-  // Clone to avoid mutation
+  // clone to avoid mutation
   let updatedItems = JSON.parse(JSON.stringify(selectedItems));
 
   const found = findItemAndParents(array, selectedId);
@@ -303,7 +302,7 @@ export function updateSelectedItems(array, selectedId, selectedItems = []) {
       // if already selected, remove it and clean up empty parents
       updatedItems = removeItemAndEmptyParents(updatedItems, selectedId);
     } else {
-      // If not selected, add the item and all its parents
+      // if not selected, add the item and all its parents
       if (item.isFile) {
         parentPath.push({ ...item });
       } else {
