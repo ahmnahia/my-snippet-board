@@ -9,8 +9,8 @@ import {
   editNestedFolderName,
   getNestedFoldersNFilesIds,
 } from "@/scripts";
-import { set, get, del, setMany } from "idb-keyval";
-
+import { set, get, del, } from "idb-keyval";
+import { useToast } from "@/hooks/use-toast"
 export const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
   ADD_A_NEW_SNIPPET: "ADD_A_NEW_SNIPPET",
@@ -302,6 +302,7 @@ export default function useBoardHook() {
   const mousePosition = useRef({ x: undefined, y: undefined });
   const isBoardDragListenerSet = useRef(false);
   const isCurrentFileDestinationChanged = useRef(false);
+  const { toast } = useToast()
 
   const [state, dispatch] = useReducer(reducer, {
     snippets: undefined,
@@ -311,7 +312,6 @@ export default function useBoardHook() {
     undoStack: [],
     redoStack: [],
   });
-
 
   useEffect(() => {
     // Dealing with local storage when a file destination is changed
@@ -620,21 +620,30 @@ export default function useBoardHook() {
 
   const deleteAFolderOrFile = (folderId) => {
     // const allSnippets = JSON.parse(localStorage.getItem("allSnippets"));
-    get("allSnippets").then((allSnippets) => {
-      allSnippets = allSnippets || [];
-      const arrOfIds = [];
-      getNestedFoldersNFilesIds(state.folderAndFilesKeys, folderId, arrOfIds);
-      arrOfIds.forEach((eachId) => {
-        if (allSnippets[eachId]) delete allSnippets[eachId];
-      });
-      // localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
-      set("allSnippets", allSnippets).then(() => {
-        dispatch({
-          type: ACTIONS.DELETE_A_FOLDER_OR_FILE,
-          payload: { folderId },
+    get("allSnippets")
+      .then((allSnippets) => {
+        allSnippets = allSnippets || [];
+        const arrOfIds = [];
+        getNestedFoldersNFilesIds(state.folderAndFilesKeys, folderId, arrOfIds);
+        arrOfIds.forEach((eachId) => {
+          if (eachId == state.currentFileDestination.id) {
+            // user is trying to delete a file that he is currently has opened. If so, we should throw an error
+            throw new Error("Cannot delete a file that is opened.");
+          }
+          if (allSnippets[eachId]) delete allSnippets[eachId];
         });
+        // localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
+        set("allSnippets", allSnippets).then(() => {
+          dispatch({
+            type: ACTIONS.DELETE_A_FOLDER_OR_FILE,
+            payload: { folderId },
+          });
+        });
+      })
+      .catch((e) => {
+        // console.log("is this catched?!: ", e.message);
+        toast({title: "ERROR!", description: e.message})
       });
-    });
   };
 
   const editAFolderOrFileName = (folderId, name) => {

@@ -1,5 +1,6 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider,  } from "@/components/ui/sidebar";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/toaster"
 import "./globals.css";
 
 export const metadata = {
@@ -10,10 +11,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={` antialiased`}>
+      <body className={`antialiased`}>
         <SidebarProvider>
           <ThemeProvider attribute={"class"} defaultTheme="dark">
             {children}
+            <Toaster />
           </ThemeProvider>
         </SidebarProvider>
       </body>
