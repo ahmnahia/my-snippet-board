@@ -37,17 +37,17 @@ export default function useExportImportFolderPopup(dispatch) {
             ],
           },
         });
-        return;
+      } else {
+        addToFolder(
+          folderAndFilesKeys,
+          folderId,
+          dataToImport.folderAndFilesKeys
+        );
+        dispatch({
+          type: ACTIONS.IMPORT_JSON_FILE,
+          payload: { folderAndFilesKeys },
+        });
       }
-      addToFolder(
-        folderAndFilesKeys,
-        folderId,
-        dataToImport.folderAndFilesKeys
-      );
-      dispatch({
-        type: ACTIONS.IMPORT_JSON_FILE,
-        payload: { folderAndFilesKeys,  },
-      });
       const allSnippets = { ...val, ...dataToImport.allSnippets };
       set("allSnippets", allSnippets).then(() => {
         console.log("allsnippets saved", allSnippets);
