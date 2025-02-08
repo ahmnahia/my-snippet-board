@@ -1,6 +1,6 @@
 "use client";
 
-import { addToFolder } from "@/scripts";
+import { addToFolder, assignNewIds, traverseNestedArray } from "@/scripts";
 import { useRef, useState } from "react";
 import { ACTIONS } from "./useBoardHook";
 import { get, set } from "idb-keyval";
@@ -26,6 +26,32 @@ export default function useExportImportFolderPopup(dispatch) {
 
   const handleFolderImportDestination = (folderId, folderAndFilesKeys) => {
     get("allSnippets").then((val) => {
+      const folderAndFilesKeysWithNewIds = assignNewIds(
+        dataToImport.folderAndFilesKeys
+      );
+      const flattenedArray = [];
+      traverseNestedArray(folderAndFilesKeysWithNewIds, 0, flattenedArray);
+
+      console.log(
+        "addToFolder():",
+        dataToImport,
+        "folderAndFilesKeysWithNewIds",
+        folderAndFilesKeysWithNewIds
+      );
+
+      flattenedArray.forEach((ei) => {
+        if (dataToImport.allSnippets) {
+          dataToImport.allSnippets[ei.id] = dataToImport.allSnippets[ei.oldId];
+          delete dataToImport.allSnippets[ei.oldId];
+        }
+      });
+
+      console.log(
+        "AFTER: addToFolder():",
+        dataToImport,
+        "folderAndFilesKeysWithNewIds",
+        folderAndFilesKeysWithNewIds
+      );
       if (!folderId) {
         //import to root
         dispatch({
@@ -33,7 +59,8 @@ export default function useExportImportFolderPopup(dispatch) {
           payload: {
             folderAndFilesKeys: [
               ...folderAndFilesKeys,
-              ...dataToImport.folderAndFilesKeys,
+              // ...dataToImport.folderAndFilesKeys,
+              ...folderAndFilesKeysWithNewIds,
             ],
           },
         });
@@ -41,7 +68,9 @@ export default function useExportImportFolderPopup(dispatch) {
         addToFolder(
           folderAndFilesKeys,
           folderId,
-          dataToImport.folderAndFilesKeys
+          // dataToImport.folderAndFilesKeys
+          // dataToImport
+          folderAndFilesKeysWithNewIds
         );
         dispatch({
           type: ACTIONS.IMPORT_JSON_FILE,
@@ -52,6 +81,8 @@ export default function useExportImportFolderPopup(dispatch) {
       set("allSnippets", allSnippets).then(() => {
         console.log("allsnippets saved", allSnippets);
       });
+
+      folderBtnRef.current.click(); // close the folder structure popup
     });
   };
 

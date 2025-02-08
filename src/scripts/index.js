@@ -193,16 +193,16 @@ export function assignNewIds(folderAndFilesKeys) {
 }
 
 const downloadJson = async (data, isSelectedFilesOnly = false) => {
-  const folderAndFilesKeysWithNewIds = assignNewIds(data.folderAndFilesKeys);
+  // const folderAndFilesKeysWithNewIds = assignNewIds(data.folderAndFilesKeys);
   const flattenedArray = [];
-  traverseNestedArray(folderAndFilesKeysWithNewIds, 0, flattenedArray);
+  traverseNestedArray(data.folderAndFilesKeys, 0, flattenedArray);
 
   data.allSnippets = data.allSnippets || {};
   const allSnippetsKeys = Object.keys(data.allSnippets);
   if (isSelectedFilesOnly) {
     // filter out the unwanted snippets
     allSnippetsKeys.forEach((ek) => {
-      const isFound = flattenedArray.find((ei) => ei.oldId == ek);
+      const isFound = flattenedArray.find((ei) => ei.id == ek);
       if (!isFound) delete data.allSnippets[ek];
     });
   }
@@ -211,22 +211,23 @@ const downloadJson = async (data, isSelectedFilesOnly = false) => {
   const snippets = await get("snippets");
 
   flattenedArray.forEach((ei) => {
-    if (currentFileDestination?.id == ei.oldId) {
+    if (currentFileDestination?.id == ei.id) {
       //if the file to export is the current file opened add/update to allSnippets
-      data.allSnippets[ei.id] = snippets;
-      delete data.allSnippets[ei.oldId];
+      data.allSnippets[ei.id] = {snippets};
+      // delete data.allSnippets[ei.id]; not needed if we not assigning new id
       return;
     }
 
-    if (data.allSnippets && data.allSnippets[ei.oldId]) {
-      data.allSnippets[ei.id] = data.allSnippets[ei.oldId];
-      delete data.allSnippets[ei.oldId];
-    }
+    //this if statement not needed if we wont assign new ids when exporting
+    // if (data.allSnippets && data.allSnippets[ei.id]) {
+    //   data.allSnippets[ei.id] = data.allSnippets[ei.id];
+    //   delete data.allSnippets[ei.id];
+    // }
   });
   const jsonData = JSON.stringify(
     {
       allSnippets: data.allSnippets,
-      folderAndFilesKeys: folderAndFilesKeysWithNewIds,
+      folderAndFilesKeys: data.folderAndFilesKeys,
     },
     null,
     2
@@ -314,7 +315,22 @@ export function updateSelectedItems(array, selectedId, selectedItems = []) {
   return updatedItems;
 }
 
+// called when importing
 export const addToFolder = (structure, folderId, newFolderAndFilesKeys) => {
+  // const folderAndFilesKeysWithNewIds = assignNewIds(
+  //   dataToImport.folderAndFilesKeys
+  // );
+  // const flattenedArray = [];
+  // traverseNestedArray(folderAndFilesKeysWithNewIds, 0, flattenedArray);
+
+  // console.log("addToFolder():", dataToImport);  
+
+  // flattenedArray.forEach((ei) => {
+  //   if (dataToImport.allSnippets && dataToImport.allSnippets[ei.oldId]) {
+  //     dataToImport.allSnippets[ei.id] = dataToImport.allSnippets[ei.oldId];
+  //     delete dataToImport.allSnippets[ei.oldId];
+  //   }
+  // });
   function findAndAddToFolder(items) {
     for (const item of items) {
       if (!item.isFile && item.id === folderId) {
