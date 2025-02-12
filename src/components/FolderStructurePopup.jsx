@@ -118,7 +118,7 @@ export default function FolderStructurePopup({
           </Button>
         </DialogTrigger>
         <DialogContent
-          className="sm:max-w-[425px] border"
+          className="sm:max-w-[425px] border max-sm:w-[90%]"
           onClick={() => {
             setCurrentSelectedFileOrFolder(isExport ? [] : undefined);
             isExport && setNewFolderAndFilesKeys([]);

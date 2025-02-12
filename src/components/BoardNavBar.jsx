@@ -35,8 +35,8 @@ export default function BoardNavBar({
   } = useExportImportFolderPopup(dispatch);
 
   return (
-    <div className="z-50 w-full flex justify-center fixed top-10">
-      <div className="w-[700px] h-[50px] bg-transparent border border-zinc-400 rounded-xl flex justify-between items-center px-2">
+    <div className="z-50 w-full flex justify-center fixed top-10 pointer-events-none max-sm:px-4">
+      <div className="w-[700px] h-[50px] bg-transparent border border-zinc-400 rounded-xl flex justify-between items-center px-2 pointer-events-auto">
         <div className="">
           <AppSidebar
             snippets={snippets}
@@ -143,10 +143,7 @@ export default function BoardNavBar({
         </div>
         <div className="flex gap-3 items-center">
           <HelpPopup />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
+          <div>
                   <FolderStructurePopup
                     currentFileDestination={currentFileDestination}
                     folderAndFilesKeys={folderAndFilesKeys}
@@ -161,12 +158,16 @@ export default function BoardNavBar({
                     }
                   />
                 </div>
+          {/* <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+
               </TooltipTrigger>
               <TooltipContent>
                 <p>Current Opened File</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
           <div className="rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 p-1">
             <ThemeToggle />
           </div>

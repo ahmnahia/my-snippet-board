@@ -9,8 +9,8 @@ import {
   editNestedFolderName,
   getNestedFoldersNFilesIds,
 } from "@/scripts";
-import { set, get, del, } from "idb-keyval";
-import { useToast } from "@/hooks/use-toast"
+import { set, get, del } from "idb-keyval";
+import { useToast } from "@/hooks/use-toast";
 export const ACTIONS = {
   CHANGE_SCALE_VALUE: "CHANGE_SCALE_VALUE",
   ADD_A_NEW_SNIPPET: "ADD_A_NEW_SNIPPET",
@@ -42,7 +42,45 @@ const reducer = (state, action) => {
       return { ...state, scale: value };
 
     case ACTIONS.ADD_A_NEW_SNIPPET:
-      return { ...state, snippets: [...state.snippets, action.payload] };
+
+      return {
+        ...state,
+        snippets: action.payload.isUndo
+          ? state.snippets.filter(
+              (es) => es.id != action.payload.addedSnippet?.id
+            )
+          : [
+              ...state.snippets,
+              action.payload.isRedo
+                ? action.payload.addedSnippet
+                : action.payload,
+            ],
+        undoStack: action.payload.isUndo
+          ? state.undoStack
+          : [
+              ...state.undoStack,
+              {
+                type: ACTIONS.ADD_A_NEW_SNIPPET,
+                payload: {
+                  addedSnippet: action.payload.isRedo
+                    ? action.payload.addedSnippet
+                    : action.payload,
+                },
+              },
+            ],
+
+        redoStack: action.payload.isUndo
+          ? [
+              ...state.redoStack,
+              {
+                type: ACTIONS.ADD_A_NEW_SNIPPET,
+                payload: { addedSnippet: action.payload.addedSnippet },
+              },
+            ]
+          : action.payload.isRedo
+          ? state.redoStack
+          : [],
+      };
 
     case ACTIONS.CHANGE_MOUSE_POSITION_VALUE:
       state.mousePosition.current = action.payload;
@@ -302,7 +340,7 @@ export default function useBoardHook() {
   const mousePosition = useRef({ x: undefined, y: undefined });
   const isBoardDragListenerSet = useRef(false);
   const isCurrentFileDestinationChanged = useRef(false);
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const [state, dispatch] = useReducer(reducer, {
     snippets: undefined,
@@ -312,6 +350,7 @@ export default function useBoardHook() {
     undoStack: [],
     redoStack: [],
   });
+
 
   useEffect(() => {
     // Dealing with local storage when a file destination is changed
@@ -642,7 +681,7 @@ export default function useBoardHook() {
       })
       .catch((e) => {
         // console.log("is this catched?!: ", e.message);
-        toast({title: "ERROR!", description: e.message})
+        toast({ title: "ERROR!", description: e.message });
       });
   };
 

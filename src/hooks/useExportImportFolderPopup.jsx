@@ -32,12 +32,6 @@ export default function useExportImportFolderPopup(dispatch) {
       const flattenedArray = [];
       traverseNestedArray(folderAndFilesKeysWithNewIds, 0, flattenedArray);
 
-      console.log(
-        "addToFolder():",
-        dataToImport,
-        "folderAndFilesKeysWithNewIds",
-        folderAndFilesKeysWithNewIds
-      );
 
       flattenedArray.forEach((ei) => {
         if (dataToImport.allSnippets) {
@@ -46,12 +40,6 @@ export default function useExportImportFolderPopup(dispatch) {
         }
       });
 
-      console.log(
-        "AFTER: addToFolder():",
-        dataToImport,
-        "folderAndFilesKeysWithNewIds",
-        folderAndFilesKeysWithNewIds
-      );
       if (!folderId) {
         //import to root
         dispatch({
