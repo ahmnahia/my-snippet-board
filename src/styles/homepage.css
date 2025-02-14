@@ -1,0 +1,11 @@
+section {
+    overflow: hidden;
+}
+
+.cus-hidden {
+  @apply opacity-0 transition-all duration-500 translate-y-[50%];
+}
+
+.show {
+ @apply opacity-100  translate-y-[0%]
+}
