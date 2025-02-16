@@ -21,7 +21,7 @@ export default {
         lg: "984px",
         // xl: "1240px",
         xl: "1100px",
-        // "2xl": "1496px",
+        "2xl": "1496px",
       },
     },
     extend: {
@@ -36,7 +36,7 @@ export default {
           accent: "hsl(var(--sidebar-accent))",
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+          ring: "hsl(var(--sidebar-ring))", 
         },
       },
       borderRadius: {

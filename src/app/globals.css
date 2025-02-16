@@ -53,3 +53,10 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
+
+.gradient-text {
+  background: linear-gradient(180deg, #ffffff, #767676);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.3 !important;
+}

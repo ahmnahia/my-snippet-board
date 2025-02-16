@@ -43,22 +43,22 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="bg-zinc-900 py-20 ">
+    <section className="bg-zinc-900 py-20" id="features">
       <div className="container text-center cus-hidden">
-        <h1 className="text-6xl max-sm:text-4xl font-bold mb-6">Features</h1>
+        <h1 className="text-6xl 2xl:text-8xl max-sm:text-4xl font-bold mb-6 gradient-text">Features</h1>
         <div className="flex gap-x-3 gap-y-5 flex-wrap mt-12">
           {features.map((ef) => (
             <div
               key={ef.title}
-              className="max-md:w-full md:w-[32%] border border-zinc-900 rounded-md p-3 justify-start text-start"
+              className="max-md:w-full md:w-[32%] border border-zinc-800 rounded-md px-3 py-9 justify-start text-start"
             >
               <div className="flex items-center gap-2">
                 <span className="text-2xl bg-slate-800  p-2 rounded-lg">
                   {ef.icon}
                 </span>
-                <h3 className=""> {ef.title}</h3>
+                <h3 className="2xl:text-2xl"> {ef.title}</h3>
               </div>
-              <p className="text-zinc-500 mt-3">{ef.desc}</p>
+              <p className="text-zinc-500 mt-5 2xl:text-md">{ef.desc}</p>
             </div>
           ))}
         </div>
