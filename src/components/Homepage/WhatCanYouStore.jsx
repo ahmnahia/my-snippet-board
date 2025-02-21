@@ -17,7 +17,7 @@ export default function WhatCanYouStore() {
             </p>
           </div>
           <div className="md:w-[70%]">
-            <div className="flex flex-wrap gap-y-10">
+            <div className="flex flex-wrap gap-y-10 justify-between">
               <div className="w-[48%] px-2 max-sm:px-0">
                 <div className="flex gap-2 ">
                   <span className="text-violet-600 text-2xl 2xl:text-4xl">

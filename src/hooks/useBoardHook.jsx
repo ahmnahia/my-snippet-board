@@ -27,6 +27,7 @@ export const ACTIONS = {
   CHANGE_FILE_DESTINATION: "CHANGE_FILE_DESTINATION",
   UPDATE_SNIPPET_TITLE: "UPDATE_SNIPPET_TITLE",
   IMPORT_JSON_FILE: "IMPORT_JSON_FILE",
+  UPDATE_IS_MULTIPLE_TABS_OPEN: "UPDATE_IS_MULTIPLE_TABS_OPEN",
 };
 
 const reducer = (state, action) => {
@@ -42,7 +43,6 @@ const reducer = (state, action) => {
       return { ...state, scale: value };
 
     case ACTIONS.ADD_A_NEW_SNIPPET:
-
       return {
         ...state,
         snippets: action.payload.isUndo
@@ -329,6 +329,11 @@ const reducer = (state, action) => {
         ),
       };
 
+    case ACTIONS.UPDATE_IS_MULTIPLE_TABS_OPEN:
+      return {
+        ...state,
+        isMultipleTabsOpen: action.payload,
+      };
     default:
       return state;
   }
@@ -349,8 +354,23 @@ export default function useBoardHook() {
     currentFileDestination: undefined,
     undoStack: [],
     redoStack: [],
+    isMultipleTabsOpen: false,
   });
 
+  // if there is another tab open, toggle the field to show a popup
+  useEffect(() => {
+    const bc = new BroadcastChannel("app_channel");
+    bc.postMessage("check-tab"); // Notify existing tabs
+    bc.onmessage = (event) => {
+      if (event.data === "check-tab") {
+        dispatch({ type: ACTIONS.UPDATE_IS_MULTIPLE_TABS_OPEN, payload: true });
+      }
+    };
+
+    return () => {
+      bc.close();
+    };
+  }, []);
 
   useEffect(() => {
     // Dealing with local storage when a file destination is changed

@@ -5,6 +5,7 @@ import useBoardHook from "@/hooks/useBoardHook";
 import BoardNavBar from "./BoardNavBar";
 import useUndoRedoHook from "@/hooks/useUndoRedoHook";
 import EmptyFileGreeting from "./EmptyFileGreeting";
+import MultipleTabPopup from "./MultipleTabPopup";
 
 export default function Board() {
   const {
@@ -16,6 +17,7 @@ export default function Board() {
       folderAndFilesKeys,
       undoStack,
       redoStack,
+      isMultipleTabsOpen,
     },
     dispatch,
     changeSnippetLanguage,
@@ -38,6 +40,7 @@ export default function Board() {
 
   return (
     <>
+      {isMultipleTabsOpen && <MultipleTabPopup />}
       <BoardNavBar
         currentFileDestination={currentFileDestination}
         folderAndFilesKeys={folderAndFilesKeys}

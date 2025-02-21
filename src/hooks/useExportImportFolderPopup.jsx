@@ -4,6 +4,7 @@ import { addToFolder, assignNewIds, traverseNestedArray } from "@/scripts";
 import { useRef, useState } from "react";
 import { ACTIONS } from "./useBoardHook";
 import { get, set } from "idb-keyval";
+import { useToast } from "./use-toast";
 
 export default function useExportImportFolderPopup(dispatch) {
   const folderBtnRef = useRef();
@@ -11,6 +12,7 @@ export default function useExportImportFolderPopup(dispatch) {
   const [isExport, setIsExport] = useState(false);
   const [isImport, setIsImport] = useState(false);
   const [dataToImport, setDataToImport] = useState(undefined);
+  const { toast } = useToast();
 
   const handleExportOnClick = () => {
     setIsExport(!isExport);
@@ -25,53 +27,60 @@ export default function useExportImportFolderPopup(dispatch) {
   };
 
   const handleFolderImportDestination = (folderId, folderAndFilesKeys) => {
-    get("allSnippets").then((val) => {
-      const folderAndFilesKeysWithNewIds = assignNewIds(
-        dataToImport.folderAndFilesKeys
-      );
-      const flattenedArray = [];
-      traverseNestedArray(folderAndFilesKeysWithNewIds, 0, flattenedArray);
-
-
-      flattenedArray.forEach((ei) => {
-        if (dataToImport.allSnippets) {
-          dataToImport.allSnippets[ei.id] = dataToImport.allSnippets[ei.oldId];
-          delete dataToImport.allSnippets[ei.oldId];
-        }
-      });
-
-      if (!folderId) {
-        //import to root
-        dispatch({
-          type: ACTIONS.IMPORT_JSON_FILE,
-          payload: {
-            folderAndFilesKeys: [
-              ...folderAndFilesKeys,
-              // ...dataToImport.folderAndFilesKeys,
-              ...folderAndFilesKeysWithNewIds,
-            ],
-          },
-        });
-      } else {
-        addToFolder(
-          folderAndFilesKeys,
-          folderId,
-          // dataToImport.folderAndFilesKeys
-          // dataToImport
-          folderAndFilesKeysWithNewIds
+    get("allSnippets")
+      .then((val) => {
+        const folderAndFilesKeysWithNewIds = assignNewIds(
+          dataToImport.folderAndFilesKeys
         );
-        dispatch({
-          type: ACTIONS.IMPORT_JSON_FILE,
-          payload: { folderAndFilesKeys },
-        });
-      }
-      const allSnippets = { ...val, ...dataToImport.allSnippets };
-      set("allSnippets", allSnippets).then(() => {
-        console.log("allsnippets saved", allSnippets);
-      });
+        const flattenedArray = [];
+        traverseNestedArray(folderAndFilesKeysWithNewIds, 0, flattenedArray);
 
-      folderBtnRef.current.click(); // close the folder structure popup
-    });
+        flattenedArray.forEach((ei) => {
+          if (dataToImport.allSnippets) {
+            dataToImport.allSnippets[ei.id] =
+              dataToImport.allSnippets[ei.oldId];
+            delete dataToImport.allSnippets[ei.oldId];
+          }
+        });
+
+        if (!folderId) {
+          //import to root
+          dispatch({
+            type: ACTIONS.IMPORT_JSON_FILE,
+            payload: {
+              folderAndFilesKeys: [
+                ...folderAndFilesKeys,
+                // ...dataToImport.folderAndFilesKeys,
+                ...folderAndFilesKeysWithNewIds,
+              ],
+            },
+          });
+        } else {
+          addToFolder(
+            folderAndFilesKeys,
+            folderId,
+            // dataToImport.folderAndFilesKeys
+            // dataToImport
+            folderAndFilesKeysWithNewIds
+          );
+          dispatch({
+            type: ACTIONS.IMPORT_JSON_FILE,
+            payload: { folderAndFilesKeys },
+          });
+        }
+        const allSnippets = { ...val, ...dataToImport.allSnippets };
+        set("allSnippets", allSnippets).then(() => {
+          console.log("allsnippets saved", allSnippets);
+        });
+
+        folderBtnRef.current.click(); // close the folder structure popup
+      })
+      .catch((error) => {
+        toast({
+          title: "ERROR!",
+          description: "Something wrong with the file imported.",
+        });
+      });
   };
 
   return {
