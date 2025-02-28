@@ -75,7 +75,7 @@ export const editNestedFolderName = (arr, folderId, name) => {
 
 export const deleteNestedFolder = (arr, folderId) => {
   return arr
-    .filter((eachItem) => eachItem.id !== folderId) // Filter out the item with the matching ID
+    .filter((eachItem) => eachItem.id !== folderId) 
     .map((eachItem) => {
       if (eachItem.subFoldersAndFiles) {
         return {
@@ -116,12 +116,12 @@ export const getNestedFoldersNFilesIds = (
   });
 };
 
-// Helper function to collect all child IDs of a folder
+// helper function to collect all child IDs of a folder
 const getAllChildIds = (folderContents, arrOfIds) => {
   folderContents.forEach((item) => {
     arrOfIds.push(item.id);
     if (!item.isFile && item.subFoldersAndFiles) {
-      getAllChildIds(item.subFoldersAndFiles, arrOfIds); // Recursively add child IDs
+      getAllChildIds(item.subFoldersAndFiles, arrOfIds); // recursively add child IDs
     }
   });
 };
@@ -193,7 +193,6 @@ export function assignNewIds(folderAndFilesKeys) {
 }
 
 const downloadJson = async (data, isSelectedFilesOnly = false) => {
-  // const folderAndFilesKeysWithNewIds = assignNewIds(data.folderAndFilesKeys);
   const flattenedArray = [];
   traverseNestedArray(data.folderAndFilesKeys, 0, flattenedArray);
 
@@ -317,20 +316,6 @@ export function updateSelectedItems(array, selectedId, selectedItems = []) {
 
 // called when importing
 export const addToFolder = (structure, folderId, newFolderAndFilesKeys) => {
-  // const folderAndFilesKeysWithNewIds = assignNewIds(
-  //   dataToImport.folderAndFilesKeys
-  // );
-  // const flattenedArray = [];
-  // traverseNestedArray(folderAndFilesKeysWithNewIds, 0, flattenedArray);
-
-  // console.log("addToFolder():", dataToImport);  
-
-  // flattenedArray.forEach((ei) => {
-  //   if (dataToImport.allSnippets && dataToImport.allSnippets[ei.oldId]) {
-  //     dataToImport.allSnippets[ei.id] = dataToImport.allSnippets[ei.oldId];
-  //     delete dataToImport.allSnippets[ei.oldId];
-  //   }
-  // });
   function findAndAddToFolder(items) {
     for (const item of items) {
       if (!item.isFile && item.id === folderId) {

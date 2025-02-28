@@ -1,4 +1,3 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import Footer from "@/components/Footer";
@@ -16,13 +15,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`antialiased`}>
-        {/* <SidebarProvider> */}
           <ThemeProvider attribute={"class"} defaultTheme="dark">
             <div className="flex-grow">{children}</div>
             <Footer />
             <Toaster />
           </ThemeProvider>
-        {/* </SidebarProvider> */}
       </body>
     </html>
   );

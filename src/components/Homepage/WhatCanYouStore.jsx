@@ -4,7 +4,6 @@ export default function WhatCanYouStore() {
   return (
     <section className="bg-neutral-800 py-20">
       <div className="container text-center cus-hidden">
-        {/* <h1 className="text-6xl max-sm:text-4xl font-bold mb-6">Use Cases</h1> */}
         <div className="flex max-md:flex-wrap justify-center text-start  gap-5">
           <div className="md:w-[27%] max-md:text-center">
             <p className="text-xs text-violet-600">
@@ -64,9 +63,10 @@ export default function WhatCanYouStore() {
                     <IoCheckmark />
                   </span>
                   <div>
-                    <p className="2xl:text-2xl">API Endpoints</p>
+                    <p className="2xl:text-2xl">AI Prompts</p>
                     <p className="text-xs text-zinc-500 mt-3 2xl:text-lg">
-                      Keep track of frequently accessed API requests.
+                      Save and organize your frequently used AI prompts for
+                      ChatGPT, and other AI tools.
                     </p>
                   </div>
                 </div>
@@ -90,10 +90,9 @@ export default function WhatCanYouStore() {
                     <IoCheckmark />
                   </span>
                   <div>
-                    <p className="2xl:text-2xl">AI Prompts</p>
+                    <p className="2xl:text-2xl">API Endpoints</p>
                     <p className="text-xs text-zinc-500 mt-3 2xl:text-lg">
-                      Save and organize your frequently used AI prompts for
-                      ChatGPT, and other AI tools.
+                      Keep track of frequently accessed API requests.
                     </p>
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 "use client";
-import { useReducer, useEffect, useRef, use } from "react";
+import { useReducer, useEffect, useRef } from "react";
 import { dragElement } from "@/scripts/dragAndDropToucnAndMouse";
 import { boardSize } from "@/constants";
 import {
@@ -261,7 +261,6 @@ const reducer = (state, action) => {
           subFoldersAndFiles: action.payload.isFile ? undefined : [],
         }
       );
-      // const newFoldersAndFilesKeys = state.folderAndFilesKeys;
       return { ...state, folderAndFilesKeys: newArr };
 
     case ACTIONS.DELETE_A_FOLDER_OR_FILE:
@@ -379,17 +378,9 @@ export default function useBoardHook() {
         state.currentFileDestination &&
         isCurrentFileDestinationChanged.current
       ) {
-        // const prevFileDestination = JSON.parse(
-        //   localStorage.getItem("currentFileDestination")
-        // );
-        // localStorage.setItem(
-        //   "currentFileDestination",
-        //   JSON.stringify(state.currentFileDestination)
-        // );
         const prevFileDestination = await get("currentFileDestination"); //indexdb
         await set("currentFileDestination");
 
-        // let allSnippets = JSON.parse(localStorage.getItem("allSnippets"));
         let allSnippets = await get("allSnippets"); //indexdb
 
         allSnippets = allSnippets ? allSnippets : {};
@@ -398,34 +389,19 @@ export default function useBoardHook() {
           boardDimensions: state.boardDimensions,
         };
         allSnippets[state.currentFileDestination.id]?.snippets
-          ? // localStorage.setItem(
-            //     "snippets",
-            //     JSON.stringify(
-            //       allSnippets[state.currentFileDestination.id].snippets
-            //     )
-            //   )
-            await set(
+          ? await set(
               "snippets",
               allSnippets[state.currentFileDestination.id].snippets
             ) //indexeddb
-          : // localStorage.removeItem("snippets")
-            await del("snippets"); //indexeddb
+          : await del("snippets"); //indexeddb
 
         allSnippets[state.currentFileDestination.id]?.boardDimensions
-          ? //  localStorage.setItem(
-            //     "boardDimensions",
-            //     JSON.stringify(
-            //       allSnippets[state.currentFileDestination.id].boardDimensions
-            //     )
-            //   )
-            await set(
+          ? await set(
               "boardDimensions",
               allSnippets[state.currentFileDestination.id].boardDimensions
             ) //indexeddb
-          : // localStorage.removeItem("boardDimensions")
-            await del("boardDimensions"); //indexeddb
+          : await del("boardDimensions"); //indexeddb
 
-        // localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
         await set("allSnippets", allSnippets);
         window.location.reload();
       }
@@ -440,12 +416,7 @@ export default function useBoardHook() {
         boardDimensions,
         currentFileDestination,
         folderAndFilesKeys;
-      // storedSnippets = JSON.parse(localStorage.getItem("snippets"));
-      // boardDimensions = JSON.parse(localStorage.getItem("boardDimensions"));
-      // folderAndFilesKeys = JSON.parse(localStorage.getItem("folderAndFilesKeys"));
-      // currentFileDestination = JSON.parse(
-      //   localStorage.getItem("currentFileDestination")
-      // );
+
       storedSnippets = await get("snippets");
       boardDimensions = await get("boardDimensions");
       folderAndFilesKeys = await get("folderAndFilesKeys");
@@ -474,9 +445,7 @@ export default function useBoardHook() {
         folderAndFilesKeys = [defaultFile];
         currentFileDestination = defaultFile;
       }
-      // if (!currentFileDestination) {
-      //   currentFileDestination = "default";
-      // }
+
       dispatch({
         type: ACTIONS.LOAD_DATA_FROM_LS,
         payload: {
@@ -494,18 +463,6 @@ export default function useBoardHook() {
     // update ls whenever new folder/file created or curren opened file changed
     const handleFileChange = async () => {
       if (state.folderAndFilesKeys && state.currentFileDestination) {
-        // localStorage.setItem(
-        //   "folderAndFilesKeys",
-        //   JSON.stringify(state.folderAndFilesKeys)
-        // );
-        // localStorage.setItem(
-        //   "currentFileDestination",
-        //   JSON.stringify(state.currentFileDestination)
-        // );
-        // setMany([
-        //   ["folderAndFilesKeys", state.folderAndFilesKeys],
-        //   ["currentFileDestination", state.currentFileDestination],
-        // ]);
         await set("folderAndFilesKeys", state.folderAndFilesKeys);
         await set("currentFileDestination", state.currentFileDestination);
       }
@@ -540,10 +497,6 @@ export default function useBoardHook() {
     if (!state.boardDimensions) {
       return;
     }
-    // localStorage.setItem(
-    //   "boardDimensions",
-    //   JSON.stringify(state.boardDimensions)
-    // );
     set("boardDimensions", state.boardDimensions); //indexed db
   }, [state.boardDimensions]);
 
@@ -678,7 +631,6 @@ export default function useBoardHook() {
   };
 
   const deleteAFolderOrFile = (folderId) => {
-    // const allSnippets = JSON.parse(localStorage.getItem("allSnippets"));
     get("allSnippets")
       .then((allSnippets) => {
         allSnippets = allSnippets || [];
@@ -691,7 +643,6 @@ export default function useBoardHook() {
           }
           if (allSnippets[eachId]) delete allSnippets[eachId];
         });
-        // localStorage.setItem("allSnippets", JSON.stringify(allSnippets));
         set("allSnippets", allSnippets).then(() => {
           dispatch({
             type: ACTIONS.DELETE_A_FOLDER_OR_FILE,
@@ -700,7 +651,6 @@ export default function useBoardHook() {
         });
       })
       .catch((e) => {
-        // console.log("is this catched?!: ", e.message);
         toast({ title: "ERROR!", description: e.message });
       });
   };

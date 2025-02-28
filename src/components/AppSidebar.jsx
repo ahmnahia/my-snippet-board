@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/sidebar";
 
 export function AppSidebar({ snippets, updateBoardView }) {
-  //   const { open } = useSidebar();
   const [filteredSnippets, setFilteredSnippets] = useState(snippets);
   const [searchString, setSearchString] = useState("");
   const deferredsearchString = useDeferredValue(searchString);

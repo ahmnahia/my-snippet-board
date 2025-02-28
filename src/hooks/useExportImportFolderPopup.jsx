@@ -50,7 +50,6 @@ export default function useExportImportFolderPopup(dispatch) {
             payload: {
               folderAndFilesKeys: [
                 ...folderAndFilesKeys,
-                // ...dataToImport.folderAndFilesKeys,
                 ...folderAndFilesKeysWithNewIds,
               ],
             },
@@ -59,8 +58,6 @@ export default function useExportImportFolderPopup(dispatch) {
           addToFolder(
             folderAndFilesKeys,
             folderId,
-            // dataToImport.folderAndFilesKeys
-            // dataToImport
             folderAndFilesKeysWithNewIds
           );
           dispatch({

@@ -13,6 +13,7 @@ import { SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import useExportImportFolderPopup from "@/hooks/useExportImportFolderPopup";
 import { HelpPopup } from "./HelpPopup";
+import { IoHome } from "react-icons/io5";
 
 export default function BoardNavBar({
   currentFileDestination,
@@ -42,7 +43,15 @@ export default function BoardNavBar({
             snippets={snippets}
             updateBoardView={actions.updateBoardView}
           />
-          <SidebarTrigger className="relative" />
+          <div className="flex items-center">
+            <SidebarTrigger className="relative" />
+            <a // used <a> insead of Link cuz using Link won't show other sections of Homepage
+              href="/"
+              className="p-2 rounded-lg  hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            >
+              <IoHome />
+            </a>
+          </div>
         </div>
         <div className="flex gap-2">
           <TooltipProvider>
@@ -144,30 +153,18 @@ export default function BoardNavBar({
         <div className="flex gap-3 items-center">
           <HelpPopup />
           <div>
-                  <FolderStructurePopup
-                    currentFileDestination={currentFileDestination}
-                    folderAndFilesKeys={folderAndFilesKeys}
-                    actions={actions}
-                    folderBtnRef={folderBtnRef}
-                    isExport={isExport}
-                    handleExportOnClick={handleExportOnClick}
-                    toggleImportState={toggleImportState}
-                    isImport={isImport}
-                    handleFolderImportDestination={
-                      handleFolderImportDestination
-                    }
-                  />
-                </div>
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Current Opened File</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
+            <FolderStructurePopup
+              currentFileDestination={currentFileDestination}
+              folderAndFilesKeys={folderAndFilesKeys}
+              actions={actions}
+              folderBtnRef={folderBtnRef}
+              isExport={isExport}
+              handleExportOnClick={handleExportOnClick}
+              toggleImportState={toggleImportState}
+              isImport={isImport}
+              handleFolderImportDestination={handleFolderImportDestination}
+            />
+          </div>
           <div className="rounded-lg hover:cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 p-1">
             <ThemeToggle />
           </div>
