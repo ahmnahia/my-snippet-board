@@ -4,17 +4,23 @@ export default function Hero() {
     <section className="bg-neutral-800">
       <div className="w-full h-[100vh] flex flex-col items-center justify-center text-center container cus-hidden">
         {/* Title */}
-        <h1 className="text-6xl 2xl:text-8xl max-sm:text-4xl font-bold mb-6 gradient-text">My Snippet Board</h1>
+        <h1 className="text-6xl 2xl:text-8xl max-sm:text-4xl font-bold mb-6 gradient-text">
+          My Snippet Board
+        </h1>
 
         {/* Short Description */}
         <p className="text-xl 2xl:text-2xl text-zinc-500 max-w-2xl">
-          Effortlessly organize, save, and manage your code snippets in one
-          place
+          Efficiently organize, save, and manage your code snippets in one place
         </p>
 
         {/* Video */}
         <div className="w-[900px] 2xl:w-[1200px] max-lg:w-[100%] rounded-xl my-6">
-          <video className="w-full h-full  rounded-lg pointer-events-none" autoPlay muted loop>
+          <video
+            className="w-full h-full  rounded-lg pointer-events-none"
+            autoPlay
+            muted
+            loop
+          >
             <source src="/videos/demo2.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>

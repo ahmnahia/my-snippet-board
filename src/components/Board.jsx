@@ -6,6 +6,7 @@ import BoardNavBar from "./BoardNavBar";
 import useUndoRedoHook from "@/hooks/useUndoRedoHook";
 import EmptyFileGreeting from "./EmptyFileGreeting";
 import MultipleTabPopup from "./MultipleTabPopup";
+import { Loader2 } from "lucide-react";
 
 export default function Board() {
   const {
@@ -35,7 +36,11 @@ export default function Board() {
   );
 
   if (!snippets || !boardDimensions || !currentFileDestination) {
-    return <h1> Loading ...</h1>;
+    return (
+      <div className="w-full h-[100vh] flex items-center justify-center bg-white dark:bg-zinc-800">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
   }
 
   return (

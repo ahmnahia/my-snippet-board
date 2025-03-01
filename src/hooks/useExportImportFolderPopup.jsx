@@ -37,6 +37,7 @@ export default function useExportImportFolderPopup(dispatch) {
 
         flattenedArray.forEach((ei) => {
           if (dataToImport.allSnippets) {
+            if (!ei.isFile) return; // a folder doesn't have to be in the allSnippets object
             dataToImport.allSnippets[ei.id] =
               dataToImport.allSnippets[ei.oldId];
             delete dataToImport.allSnippets[ei.oldId];

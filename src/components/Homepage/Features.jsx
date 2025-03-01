@@ -10,7 +10,6 @@ import { IoClipboardOutline } from "react-icons/io5";
 const features = [
   {
     icon: <IoClipboardOutline />,
-
     title: "Snippet Creation & Customization",
     desc: "Easily create new snippets by pasting your code directly into the board and customize them freely.",
   },
@@ -37,7 +36,7 @@ const features = [
   {
     icon: <CiDollar />,
     title: "Completely Free",
-    desc: "MySnippetBoard is free to use, with no hidden charges. Manage your snippets effortlessly without any subscriptions or fees.",
+    desc: "MySnippetBoard is free to use, with no hidden charges. Manage your snippets without any subscriptions or fees.",
   },
 ];
 
@@ -45,7 +44,9 @@ export default function Features() {
   return (
     <section className="bg-zinc-900 py-20" id="features">
       <div className="container text-center cus-hidden">
-        <h1 className="text-6xl 2xl:text-8xl max-sm:text-4xl font-bold mb-6 gradient-text">Features</h1>
+        <h1 className="text-6xl 2xl:text-8xl max-sm:text-4xl font-bold mb-6 gradient-text">
+          Features
+        </h1>
         <div className="flex gap-x-3 gap-y-5 flex-wrap mt-12 justify-between">
           {features.map((ef) => (
             <div

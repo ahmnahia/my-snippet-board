@@ -13,7 +13,7 @@ export default function BreadcrumbWrapper({ pagename }) {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/" className="flex items-center gap-1">
+          <BreadcrumbLink href="/" className="flex items-center gap-1 hover:text-white">
             <span className="text-lg ">
               <IoHome />
             </span>
@@ -22,8 +22,8 @@ export default function BreadcrumbWrapper({ pagename }) {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
 
-        <BreadcrumbItem>
-          <BreadcrumbPage>{pagename}</BreadcrumbPage>
+        <BreadcrumbItem >
+          <BreadcrumbPage className="text-white">{pagename}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>

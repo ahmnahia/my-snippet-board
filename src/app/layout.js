@@ -8,18 +8,19 @@ export const metadata = {
     default: "MySnippetBoard",
     template: "%s - MySnippetBoard",
   },
-  description: "Organize, save, and manage your code snippets efficiently—all in one place."
+  description:
+    "Organize, save, and manage your code snippets efficiently—all in one place.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning >
       <body className={`antialiased`}>
-          <ThemeProvider attribute={"class"} defaultTheme="dark">
-            <div className="flex-grow">{children}</div>
-            <Footer />
-            <Toaster />
-          </ThemeProvider>
+        <ThemeProvider attribute={"class"} defaultTheme="dark">
+          <div className="flex-grow">{children}</div>
+          <Footer />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
