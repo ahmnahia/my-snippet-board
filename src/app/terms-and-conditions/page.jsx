@@ -9,7 +9,7 @@ export default function TermsAndConditions() {
     <div className="py-16 flex justify-center bg-neutral-800 text-white">
       <div className="container max-w-[600px] flex-1 h-[100%] cus-hidden show">
         <BreadcrumbWrapper pagename={"Terms and Conditions"} />
-        <h1 className="text-4xl font-bold my-6">Terms and Conditions</h1>
+        <h1 className="text-4xl max-sm:text-3xl font-bold my-6">Terms and Conditions</h1>
         <p className="mt-4">
           <b>Last Updated:</b>{" "}
           <span className="text-zinc-400">28 February, 2025</span>
@@ -19,7 +19,7 @@ export default function TermsAndConditions() {
           with and be bound by the following terms and conditions. Please read
           them carefully.
         </p>
-        <ul className="mt-4 [&>li]:list-decimal [&>li]:mt-4 text-xl">
+        <ul className="mt-4 [&>li]:list-decimal [&>li]:mt-4 [&>li]:ml-4 text-xl">
           <li>
             <div>
               <h3 className="text-xl">Acceptance of Terms</h3>
