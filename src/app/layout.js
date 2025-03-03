@@ -14,13 +14,18 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning >
+    <html lang="en" suppressHydrationWarning>
       <body className={`antialiased`}>
         <ThemeProvider attribute={"class"} defaultTheme="dark">
           <div className="flex-grow">{children}</div>
           <Footer />
           <Toaster />
         </ThemeProvider>
+        <script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: process.env.CF_WA_TOKEN })}
+        ></script>
       </body>
     </html>
   );

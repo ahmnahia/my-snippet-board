@@ -13,9 +13,18 @@ export default function PrivacyPolicy() {
         <p className="my-3 text-zinc-400">
           We value your privacy and do not collect or store any of your data.
         </p>
-        <p className="text-muted-foreground text-zinc-400">
+        <p className="my-3 text-muted-foreground text-zinc-400">
           All your snippets are stored locally in the browser and are never sent
           to a server. We do not track, analyze, or share any information.
+        </p>
+        <p className="my-3 text-muted-foreground text-zinc-400">
+          All your snippets are stored locally in the browser and are never sent
+          to a server. We do not track, analyze, or share any information.
+        </p>
+        <p className="my-3 text-muted-foreground text-zinc-400">
+          To understand how many visitors use MySnippetBoard, we use
+          privacy-friendly third-party services that collect anonymous visitor
+          data without using cookies or tracking personal information.
         </p>
       </div>
     </div>
